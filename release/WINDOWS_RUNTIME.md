@@ -19,3 +19,5 @@ ProgramRoot 是解压位置；LibraryRoot、StateRoot、CacheRoot 必须是互�
 逐文件清单为 `runtime/postgresql/windows-x64/manifest.json`；来源、版本和许可证表为 `release/windows-runtime-dependencies.json`；官方来源锁与构建方法为 `release/windows-native-build-lock.json` 和 `release/WINDOWS_NATIVE_BUILD.md`。源归档中的 PostgreSQL tzdata 2026c 按上游文档更新为 2026e，时区引擎未改动。PostgreSQL C/UTF8 核心上游 231 项、pg_trgm 4 项、pgcrypto 25 项、isolation 122 项通过；OpenSSL 全默认上游 4,135 断言通过，平台/禁用特性按上游跳过。保留第一次宿主中文 locale 导致的 ICU/cascade 差异，不修改 expected 伪造通过。
 
 运行时 `licenses/` 与应用 `licenses/` 保留 PostgreSQL、Unicode、OpenSSL、压缩库、驱动及 Microsoft 原始许可证和 notices。源码发布不包含数据库二进制、wheels、CRT、配置、PGDATA、venv、原件或私有日志。**公开二进制再分发仍须满足 Microsoft Runtime License 的授权和分发条件**；已有 BuildTools 不能单独证明 Visual Studio Products 许可。私有本机包已经完成验证，该验证不等于确认公开 CRT 再分发权利。构建锁明确区分发布者 checksum 与仅本地计算的 hash，不把校验值称为签名。
+
+PostgreSQL 启动最多等待 5 分钟，正常就绪立即返回，并非固定等待；恢复超过上限时先查看私有日志并稍后重试，严格所有权检查不会跳过。

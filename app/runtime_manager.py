@@ -402,7 +402,7 @@ class RuntimeManager:
             atomic_json(self.config_path, self.config)
         self._write_server_config()
         self.started_this_call = True
-        self._run("pg_ctl", "start", "-D", self.pgdata, "-l", self.logs / "postgresql.log", "-w", "-t", "45", timeout=60)
+        self._run("pg_ctl", "start", "-D", self.pgdata, "-l", self.logs / "postgresql.log", "-w", "-t", "300", timeout=330)
 
     def start(self):
         self.verify_binaries()
