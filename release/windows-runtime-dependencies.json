@@ -1,0 +1,315 @@
+{
+  "baseline": "CPython3.14.8 x64 on Windows, local system Python; no bundled Python or browser",
+  "policy": "Pin latest stable product dependencies verified 2026-10-13; no prerelease and no automatic network updates at startup",
+  "postgresql": {
+    "version": "18.6",
+    "distribution": "native MSVC build from official PostgreSQL source",
+    "sourceLock": "release/windows-native-build-lock.json",
+    "sourceURL": "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.gz",
+    "sourceSha256": "983ee554ec53dbeb9b70797bef9fcf4e67e117e7e48ca1463cc80b3ff8e8ff3f",
+    "filesManifest": "runtime/postgresql/windows-x64/manifest.json",
+    "features": {
+      "ssl": "openssl4.0.3",
+      "icu": "78.3",
+      "zlib": "1.3.2",
+      "lz4": "1.10.0",
+      "zstd": "1.5.7",
+      "tzdata": "2026e",
+      "pg_trgm": true,
+      "nls": false,
+      "libxml": false,
+      "libxslt": false,
+      "libcurl": false,
+      "plperl": false,
+      "plpython": false,
+      "pltcl": false,
+      "llvm": false,
+      "ldap": false,
+      "gssapi": false,
+      "readline": false,
+      "plpgsql": true,
+      "backupCompression": [
+        "gzip",
+        "lz4",
+        "zstd"
+      ]
+    },
+    "runtimeDependencies": [
+      {
+        "component": "ICU SDK",
+        "version": "78.3",
+        "license": "Unicode-3.0"
+      },
+      {
+        "component": "zlib",
+        "version": "1.3.2",
+        "license": "Zlib"
+      },
+      {
+        "component": "LZ4",
+        "version": "1.10.0",
+        "license": "BSD-2-Clause"
+      },
+      {
+        "component": "Zstandard",
+        "version": "1.5.7",
+        "license": "BSD-3-Clause"
+      },
+      {
+        "component": "OpenSSL",
+        "version": "4.0.3",
+        "license": "Apache-2.0"
+      },
+      {
+        "component": "IANA tzdata",
+        "version": "2026e",
+        "license": "public-domain"
+      }
+    ],
+    "crtVersion": "14.51.36247.0",
+    "upstreamTestSummary": {
+      "PostgreSQLCore": "231/231 PASS controlled C/UTF8; upstream expected unchanged",
+      "pg_trgm": "4/4 PASS",
+      "pgcrypto": "25/25 PASS",
+      "isolation": "122/122 PASS",
+      "OpenSSL": "368 files / 4135 tests PASS",
+      "zlib": "14/14 PASS serial",
+      "LZ4": "1000 upstream fuzzer PASS",
+      "Zstandard": "1000 fuzzer + 1000 stream PASS",
+      "nativeFeatureChecks": "10/10 PASS TLS1.3 verify-full / Unicode / tz2026e / compression restore / providers / C libpq",
+      "launcher": "17/17 lifecycle plus 10/10 ownership and proxy checks"
+    }
+  },
+  "pythonDependencies": [
+    {
+      "package": "psycopg",
+      "version": "3.3.6",
+      "filename": "psycopg-3.3.6-py3-none-any.whl",
+      "bytes": 215490,
+      "sha256": "a1db9f7148b06a28606767efaca51fa6f9398c5c0a3810519be69d7000bdb631",
+      "url": "https://files.pythonhosted.org/packages/4e/de/748bd7609c71cae5d737f0ba9192f19329f70180ecda8fff3cac02c5abe3/psycopg-3.3.6-py3-none-any.whl",
+      "sourcePage": "https://pypi.org/project/psycopg/3.3.6/",
+      "license": "LGPL-3.0-only",
+      "pythonRequires": ">=3.10"
+    },
+    {
+      "package": "psycopg-pool",
+      "version": "3.3.3",
+      "filename": "psycopg_pool-3.3.3-py3-none-any.whl",
+      "bytes": 40304,
+      "sha256": "9b9cd6a4fcec47a410f7e82d408540e7f77b478509e91b44c1a5457a13e5ff37",
+      "url": "https://files.pythonhosted.org/packages/5d/b4/452c6607a0f479465cd8a9b0d9956919fcb150050c1f83f9f11e6b8ee8dc/psycopg_pool-3.3.3-py3-none-any.whl",
+      "sourcePage": "https://pypi.org/project/psycopg-pool/3.3.3/",
+      "license": "LGPL-3.0-only",
+      "pythonRequires": ">=3.10"
+    },
+    {
+      "package": "tzdata",
+      "version": "2026.5",
+      "filename": "tzdata-2026.5-py2.py3-none-any.whl",
+      "bytes": 347996,
+      "sha256": "b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac",
+      "url": "https://files.pythonhosted.org/packages/94/21/1e5995a1c920cce14e4bffae20c665ec10e7ed03ab25e006cd741092b718/tzdata-2026.5-py2.py3-none-any.whl",
+      "sourcePage": "https://pypi.org/project/tzdata/2026.5/",
+      "license": "Apache-2.0",
+      "pythonRequires": ">=2"
+    },
+    {
+      "package": "typing-extensions",
+      "version": "4.16.0",
+      "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+      "bytes": 45571,
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+      "sourcePage": "https://pypi.org/project/typing-extensions/4.16.0/",
+      "license": "PSF-2.0",
+      "pythonRequires": ">=3.9"
+    },
+    {
+      "package": "apsw",
+      "version": "3.54.0.0",
+      "filename": "apsw-3.54.0.0-cp314-cp314-win_amd64.whl",
+      "bytes": 3437722,
+      "sha256": "f99136f664d2f98e6f881bfcfd02a887f45e5bc1e5de0b37c1af20c824113f9f",
+      "url": "https://files.pythonhosted.org/packages/cc/06/cab013232198d943e995b6453efd6eafb9060dbb5e9d8f63ab38f7605903/apsw-3.54.0.0-cp314-cp314-win_amd64.whl",
+      "sourcePage": "https://pypi.org/project/apsw/3.54.0.0/",
+      "license": "any-OSI",
+      "pythonRequires": ">=3.10"
+    },
+    {
+      "package": "psycopg-c",
+      "version": "3.3.6",
+      "filename": "psycopg_c-3.3.6-cp314-cp314-win_amd64.whl",
+      "bytes": 1031793,
+      "sha256": "3bf61997e6e6a15f68c341b9b2723e90cc2d736f6b9fc9ff319499745590c8d6",
+      "sourcePage": "https://pypi.org/project/psycopg-c/3.3.6/",
+      "sourceURL": "https://files.pythonhosted.org/packages/58/53/bf15aa48cd6f0ad0039b9f48681d2e76e8564d413af47b13fab50dd03555/psycopg_c-3.3.6.tar.gz",
+      "sourceSha256": "29c568426ad61c1b702c7d73505c43ca2c9fc5d97a8431d8d9049e731e319ff8",
+      "license": "LGPL-3.0-only",
+      "pythonRequires": ">=3.10",
+      "build": "Local unmodified upstream sdist, MSVC14.51.36231, CPython3.14.8 x64, PostgreSQL18.6 libpq; build source requirements pin setuptools83.0.0",
+      "linkedLibpqVersion": "18.6"
+    }
+  ],
+  "markdown": {
+    "package": "Markdown",
+    "version": "3.11",
+    "license": "BSD-3-Clause",
+    "sourcePage": "https://pypi.org/project/Markdown/3.11/",
+    "url": "https://files.pythonhosted.org/packages/ec/1e/32971905a7ab47f8b66866ed949fa48b104ba1c4a6fa57794c4f2c4b2cb8/markdown-3.11-py3-none-any.whl",
+    "wheelFilename": "markdown-3.11-py3-none-any.whl",
+    "wheelSha256": "cd6c89e7eb308c8b332ed673215a52d208a43f8bacc030b1419376129408719e",
+    "files": [
+      {
+        "path": "markdown/__init__.py",
+        "sha256": "75fcf0c1da46f4bf102c43c1a4b14f207c7f04dd39e9a657a7dc5989f4f16085"
+      },
+      {
+        "path": "markdown/__main__.py",
+        "sha256": "626bbf446d0a99f960da4bf7ab74684e5c0e75fb44512e5ccd7927b5ac6eee10"
+      },
+      {
+        "path": "markdown/__meta__.py",
+        "sha256": "6c38daf480a0662abf53d5cd9c4e6aa1f578980e88dce58d6496d70955d828ea"
+      },
+      {
+        "path": "markdown/blockparser.py",
+        "sha256": "8f80902265698aaee0f69cfcc02c6fcd3eb55ff4f68920235eea47264f0fdde0"
+      },
+      {
+        "path": "markdown/blockprocessors.py",
+        "sha256": "52deb65b5246c8b31827f044e19a8735ce49ddd61f25d021321baab26dba59ec"
+      },
+      {
+        "path": "markdown/core.py",
+        "sha256": "58799503dc189e0bb2b278aa4d0bb425bf95354b5092db90f6c3473932c077ae"
+      },
+      {
+        "path": "markdown/extensions/__init__.py",
+        "sha256": "f73d6486c74a095ae6ac9ff619fc6d3c07630f717231ee6f842ef098ce0ef66d"
+      },
+      {
+        "path": "markdown/extensions/abbr.py",
+        "sha256": "318eea207915b1d9116626a3bebda7f7fb937f09649e66876bfc2a1c6165a55b"
+      },
+      {
+        "path": "markdown/extensions/admonition.py",
+        "sha256": "57b46c4c80da1155bf92d3d237bd9265e6a04a086467dd9c6188ccbbf4305375"
+      },
+      {
+        "path": "markdown/extensions/attr_list.py",
+        "sha256": "7cb2c62e54607b7aaed78a754d15f83355ff30f454105a5616fba57cf9c7fd4c"
+      },
+      {
+        "path": "markdown/extensions/codehilite.py",
+        "sha256": "830d448df5c2d324eb5c36601161a44e4aed8cc06d0c65a62c73e3dd72f3c400"
+      },
+      {
+        "path": "markdown/extensions/def_list.py",
+        "sha256": "3b8fd17e48fe615c254bdb8c96d7f00a526fd91f8c1700a36fa9a0c47dfae7b6"
+      },
+      {
+        "path": "markdown/extensions/extra.py",
+        "sha256": "d6f95e4f6f3892e79de07401b45f372234ae989568d2ade783a3234e454d7cd4"
+      },
+      {
+        "path": "markdown/extensions/fenced_code.py",
+        "sha256": "fe3cc05d34c26176240b2b7b3bb39e6b179d3aeb65f9b2ea6515951aeb10e8af"
+      },
+      {
+        "path": "markdown/extensions/footnotes.py",
+        "sha256": "10c22cd29b8ee6577cac82fab17e593339562c1c4cf35f45670fd46dc5058706"
+      },
+      {
+        "path": "markdown/extensions/legacy_attrs.py",
+        "sha256": "8d8cc8110cc8941bdcfd2e3867057056900f09c76132826e0465c717672bc85a"
+      },
+      {
+        "path": "markdown/extensions/legacy_em.py",
+        "sha256": "f78d619b95c1fbe09e90ae1e6d7a67d597dcef998ed56ff932b6b0e32244b659"
+      },
+      {
+        "path": "markdown/extensions/md_in_html.py",
+        "sha256": "4bfbc9042818518f86c4f41f52a203cdfef53d5d26ffc6549a99e314243975d0"
+      },
+      {
+        "path": "markdown/extensions/meta.py",
+        "sha256": "1ab6775ad1c89d925fa978f892f94e9149b3de1aa4c1eb2ae04fb802ae1432a4"
+      },
+      {
+        "path": "markdown/extensions/nl2br.py",
+        "sha256": "e037f552e42810f1e35ade4412145899b836069cdceb91e7e04da7f3e30a7a52"
+      },
+      {
+        "path": "markdown/extensions/sane_lists.py",
+        "sha256": "76d51863c957b4a9656d08c964e0d63108bb3712505dd9e9c1489f5b0a804294"
+      },
+      {
+        "path": "markdown/extensions/smarty.py",
+        "sha256": "efdabc667936dc8dd8069347bf3b28eba0bd3e952704b6cf1bfefe1d03445138"
+      },
+      {
+        "path": "markdown/extensions/tables.py",
+        "sha256": "fb23019f3a0f5afc038d435efb50fa4c6bfb36c5119bdc6b04b52d0d2a43beeb"
+      },
+      {
+        "path": "markdown/extensions/toc.py",
+        "sha256": "22a57aa226abbfe51c58d857f444c0caa9adcd705f400363afdec0ccbe2ecdc7"
+      },
+      {
+        "path": "markdown/extensions/wikilinks.py",
+        "sha256": "cfdd5dbbe292e767b6da9101c5c0572e3d79eed7cadde9791b5ba95556db3a48"
+      },
+      {
+        "path": "markdown/htmlparser.py",
+        "sha256": "2df8da5592cb09f853cd186f3acb31a35b6a9b31f780316d8ec3d1f4106a2280"
+      },
+      {
+        "path": "markdown/inlinepatterns.py",
+        "sha256": "4a27b15068842ee6a0fcfcbb327e71504c3e27427a57fce8b8bc23fceb467b33"
+      },
+      {
+        "path": "markdown/postprocessors.py",
+        "sha256": "bd30e317d0b1e125e562d51298780d77a4c822778ed4d5d98d3fc339b725780d"
+      },
+      {
+        "path": "markdown/preprocessors.py",
+        "sha256": "a6ae4d9c72a4392550788a3e6a30be62de3892fc8c57dec3d381413905dcb493"
+      },
+      {
+        "path": "markdown/serializers.py",
+        "sha256": "62d005610a0e769fd3026606a30ea7068d1e07a23e4a5e0f4cb74b0df4091f04"
+      },
+      {
+        "path": "markdown/test_tools.py",
+        "sha256": "32d37871fdd93c3b5bf37c172d3a25fb7ab7688191224276cd6afa7ddf918151"
+      },
+      {
+        "path": "markdown/treeprocessors.py",
+        "sha256": "d06738698a81f7e3a947d9f91cd14b671d436602b395bf3ebd28289a6a082626"
+      },
+      {
+        "path": "markdown/util.py",
+        "sha256": "908fb0650fbaf1d35fb017a4f732bfffbbce98e6728dc076cb85da332a008b23"
+      }
+    ]
+  },
+  "licenses": "licenses/ plus runtime/postgresql/windows-x64/licenses/; exact notices retained",
+  "privateMaterialExcluded": [
+    "machine.json",
+    "postgresql.json",
+    "venv",
+    "PGDATA",
+    "library originals",
+    "logs",
+    "credentials",
+    "test fixtures",
+    "private build paths"
+  ],
+  "crtRedistributionReview": "Private local package has been validated. Public binary redistribution remains conditional on satisfying the Microsoft Runtime License grant and redistribution conditions. Installed BuildTools alone does not prove a Visual Studio Products license. Public source excludes binary runtimes and private configurations.",
+  "systemProvided": [
+    "CPython3.14.8 x64 with standard GIL",
+    "installed Edge/browser",
+    "Windows UCRT/API-set/system DLLs"
+  ]
+}

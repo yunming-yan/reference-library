@@ -1,0 +1,71 @@
+[
+  {
+    "package": "psycopg",
+    "version": "3.3.6",
+    "filename": "psycopg-3.3.6-py3-none-any.whl",
+    "bytes": 215490,
+    "sha256": "a1db9f7148b06a28606767efaca51fa6f9398c5c0a3810519be69d7000bdb631",
+    "url": "https://files.pythonhosted.org/packages/4e/de/748bd7609c71cae5d737f0ba9192f19329f70180ecda8fff3cac02c5abe3/psycopg-3.3.6-py3-none-any.whl",
+    "sourcePage": "https://pypi.org/project/psycopg/3.3.6/",
+    "license": "LGPL-3.0-only",
+    "pythonRequires": ">=3.10"
+  },
+  {
+    "package": "psycopg-pool",
+    "version": "3.3.3",
+    "filename": "psycopg_pool-3.3.3-py3-none-any.whl",
+    "bytes": 40304,
+    "sha256": "9b9cd6a4fcec47a410f7e82d408540e7f77b478509e91b44c1a5457a13e5ff37",
+    "url": "https://files.pythonhosted.org/packages/5d/b4/452c6607a0f479465cd8a9b0d9956919fcb150050c1f83f9f11e6b8ee8dc/psycopg_pool-3.3.3-py3-none-any.whl",
+    "sourcePage": "https://pypi.org/project/psycopg-pool/3.3.3/",
+    "license": "LGPL-3.0-only",
+    "pythonRequires": ">=3.10"
+  },
+  {
+    "package": "tzdata",
+    "version": "2026.5",
+    "filename": "tzdata-2026.5-py2.py3-none-any.whl",
+    "bytes": 347996,
+    "sha256": "b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac",
+    "url": "https://files.pythonhosted.org/packages/94/21/1e5995a1c920cce14e4bffae20c665ec10e7ed03ab25e006cd741092b718/tzdata-2026.5-py2.py3-none-any.whl",
+    "sourcePage": "https://pypi.org/project/tzdata/2026.5/",
+    "license": "Apache-2.0",
+    "pythonRequires": ">=2"
+  },
+  {
+    "package": "typing-extensions",
+    "version": "4.16.0",
+    "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+    "bytes": 45571,
+    "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+    "url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+    "sourcePage": "https://pypi.org/project/typing-extensions/4.16.0/",
+    "license": "PSF-2.0",
+    "pythonRequires": ">=3.9"
+  },
+  {
+    "package": "apsw",
+    "version": "3.54.0.0",
+    "filename": "apsw-3.54.0.0-cp314-cp314-win_amd64.whl",
+    "bytes": 3437722,
+    "sha256": "f99136f664d2f98e6f881bfcfd02a887f45e5bc1e5de0b37c1af20c824113f9f",
+    "url": "https://files.pythonhosted.org/packages/cc/06/cab013232198d943e995b6453efd6eafb9060dbb5e9d8f63ab38f7605903/apsw-3.54.0.0-cp314-cp314-win_amd64.whl",
+    "sourcePage": "https://pypi.org/project/apsw/3.54.0.0/",
+    "license": "any-OSI",
+    "pythonRequires": ">=3.10"
+  },
+  {
+    "package": "psycopg-c",
+    "version": "3.3.6",
+    "filename": "psycopg_c-3.3.6-cp314-cp314-win_amd64.whl",
+    "bytes": 1031793,
+    "sha256": "3bf61997e6e6a15f68c341b9b2723e90cc2d736f6b9fc9ff319499745590c8d6",
+    "sourcePage": "https://pypi.org/project/psycopg-c/3.3.6/",
+    "sourceURL": "https://files.pythonhosted.org/packages/58/53/bf15aa48cd6f0ad0039b9f48681d2e76e8564d413af47b13fab50dd03555/psycopg_c-3.3.6.tar.gz",
+    "sourceSha256": "29c568426ad61c1b702c7d73505c43ca2c9fc5d97a8431d8d9049e731e319ff8",
+    "license": "LGPL-3.0-only",
+    "pythonRequires": ">=3.10",
+    "build": "Local unmodified upstream sdist, MSVC14.51.36231, CPython3.14.8 x64, PostgreSQL18.6 libpq; build source requirements pin setuptools83.0.0",
+    "linkedLibpqVersion": "18.6"
+  }
+]

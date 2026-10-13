@@ -1,0 +1,17 @@
+OpenSSL 4.0.3 redistribution notice
+
+This SDK was built from the unmodified official OpenSSL 4.0.3 release source.
+Copyright (c) 1998-2026 The OpenSSL Project Authors
+Copyright (c) 1995-1998 Eric A. Young, Tim J. Hudson
+All rights reserved.
+
+OpenSSL is licensed under the Apache License, Version 2.0. The complete upstream
+LICENSE.txt and README.md are included alongside this notice. Individual source
+copyright notices remain in the preserved official source archive and tree.
+
+Official project: https://openssl-library.org/
+Source: https://github.com/openssl/openssl/releases/download/openssl-4.0.3/openssl-4.0.3.tar.gz
+Source SHA256: 325b5c806167c13b40b1ffeadfe0248197c00eccc4cf123ec1e28d2d2fd216d9
+
+The upstream release has no root NOTICE file. This packaging notice was authored
+locally and does not replace or amend the upstream license or copyright notices.

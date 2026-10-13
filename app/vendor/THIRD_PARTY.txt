@@ -1,0 +1,4 @@
+Python-Markdown 3.10.2
+https://python-markdown.github.io/
+Bundled source: markdown/
+License: Markdown-LICENSE.txt (BSD 3-Clause)

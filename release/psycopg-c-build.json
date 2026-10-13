@@ -1,0 +1,22 @@
+{
+  "source": {
+    "version": "3.3.6",
+    "url": "https://files.pythonhosted.org/packages/58/53/bf15aa48cd6f0ad0039b9f48681d2e76e8564d413af47b13fab50dd03555/psycopg_c-3.3.6.tar.gz",
+    "filename": "psycopg_c-3.3.6.tar.gz",
+    "sha256": "29c568426ad61c1b702c7d73505c43ca2c9fc5d97a8431d8d9049e731e319ff8",
+    "bytes": 698245
+  },
+  "compiler": "MSVC14.51.36231 x64 (installed Visual Studio Build Tools2026)",
+  "python": "3.14.8 x64",
+  "postgresqlLibpq": "18.6",
+  "buildRequirements": [
+    "setuptools83.0.0 (upstream exact pin)",
+    "wheel0.48.0",
+    "packaging26.3"
+  ],
+  "sourceModified": false,
+  "command": "python -m pip wheel --no-deps --no-index --find-links <verified-build-wheels> --wheel-dir <output> <unmodified-source>",
+  "resultFilename": "psycopg_c-3.3.6-cp314-cp314-win_amd64.whl",
+  "sha256": "3bf61997e6e6a15f68c341b9b2723e90cc2d736f6b9fc9ff319499745590c8d6",
+  "linkedClientVersionVerified": 180006
+}

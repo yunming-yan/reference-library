@@ -1,0 +1,7 @@
+html{scroll-padding-top:136px}
+.prose h1,.prose h2,.prose h3,.prose h4{scroll-margin-top:18px}
+.reader-end{scroll-margin-top:18px}
+@media(max-width:760px){html{scroll-padding-top:112px}}
+
+.table-scroll-hint{display:none}
+@media(max-width:760px){.table-scroll-hint{display:block;margin:1.4rem 0 .4rem!important;font-size:12px!important;color:var(--muted)}.table-scroll-hint+.table-container{margin-top:0}}
