@@ -8,7 +8,7 @@ import urllib.request
 import zipfile
 from download_verified import fetch, read_json
 
-PACKAGES = {"psycopg": "3.3.6", "psycopg_pool": "3.3.3", "Markdown": "3.11", "apsw": "3.54.0.0", "typing_extensions": "4.16.0", "tzdata": "2026.5"}
+PACKAGES = {"psycopg": "3.3.6", "psycopg_pool": "3.3.3", "Markdown": "3.11.1", "apsw": "3.54.0.0", "typing_extensions": "4.16.0", "tzdata": "2026.5"}
 
 
 def main(root: Path):

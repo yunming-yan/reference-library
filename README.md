@@ -2,7 +2,7 @@
 
 用于在本机整理和阅读报告 ZIP 的资料库。默认 HTML 阅读，同时提供 Markdown 阅读、Markdown 源码、完整原件下载、标题与分类管理、回收站恢复和永久删除。
 
-拟公开项目名称：`yunming-yan/reference-library`。本目录是源码；平台运行包另行组装，目前不提供已发布下载地址。
+公开源码项目：[yunming-yan/reference-library](https://github.com/yunming-yan/reference-library)。本目录是清洁程序源码；完整离线平台包另行组装，当前没有公开二进制下载地址。
 
 ## 运行环境
 
@@ -15,11 +15,11 @@
 | PostgreSQL Python 驱动 | Psycopg 3.3.6；Windows 当前 C 实现链接 libpq 18.6 |
 | 连接池 | psycopg-pool 3.3.3 |
 | 可重建渲染缓存 | APSW 3.54.0.0 / SQLite 3.54.0 |
-| Markdown 解析器 | Python-Markdown 3.11，随源码提供 |
+| Markdown 解析器 | Python-Markdown 3.11.1，随源码和离线 wheel 提供 |
 
 版本与来源记录见 `release/`、`runtime/postgresql/*/manifest.json` 和 `wheels/*/manifest.json`。这些记录不等于全部传递依赖都处于最新版本，也不等于二进制分发已经完成验收。
 
-Windows 的本机启动与数据库流程正在候选环境验收。Mac 构建工具与分架构资源已准备，**当前 Mac 包尚未签名、公证，原生 Mac/Safari 验收仍待完成**；不能用 Windows 测试替代它们。详见 [Mac 构建与验收说明](docs/macos.md)。
+Windows 本机启动、独立存储、完整报告阅读及关闭重开已有实际验收；性能仍以对应机器、规模和负载的测量及限制为准。Mac 构建工具与分架构资源已准备，**当前 Mac 包尚未签名、公证，原生 Mac/Safari 验收仍待完成**；不能用 Windows 测试替代它们。详见 [Mac 构建与验收说明](docs/macos.md)。
 
 ## 数据与程序分开
 

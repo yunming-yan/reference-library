@@ -41,13 +41,13 @@ def main():
         except RuntimeError:
             passed(name)
         else: raise AssertionError(name + " was not rejected")
-    with patch.object(runtime_manager, "sys", SimpleNamespace(platform="darwin")), patch.object(runtime_manager, "private_acl", lambda p: None), patch.object(Path, "home", return_value=home), patch.object(launch_macos, "REPO", program), patch.dict("os.environ", {}, clear=True):
+    with patch.object(runtime_manager, "sys", SimpleNamespace(platform="darwin")), patch.object(runtime_manager, "private_acl", lambda p: None), patch.object(runtime_manager, "_mac_user_directories", return_value=(home / "Library" / "Application Support", home / "Library" / "Caches")), patch.object(launch_macos, "REPO", program), patch.dict("os.environ", {}, clear=True):
         first = launch_macos.select_machine()
         expected_data = home / "Library" / "Application Support" / "ReferenceLibrary" / "Library"
         expected_state = home / "Library" / "Application Support" / "ReferenceLibrary" / "Runtime" / first.library_id
         expected_cache = home / "Library" / "Caches" / "ReferenceLibrary" / first.library_id
         assert first.data_root == expected_data and first.private_root == expected_state and first.cache_root == expected_cache
-        passed("Darwin defaults select Application Support and Caches under synthetic host home")
+        passed("Mocked NSFileManager boundary selects user-domain Application Support and Caches")
         assert first.pgdata == first.data_root / "catalog" / "pg18-main"
         assert not runtime_manager.overlaps(first.pgdata, first.private_root) and not runtime_manager.overlaps(first.pgdata, first.cache_root)
         passed("PGDATA remains persistent Library content, disjoint from State and Cache")
@@ -97,7 +97,7 @@ def main():
         passed("Parent worker argv passes an existing persisted private profile; invocation is mocked")
         assert "D:" not in (HERE / "launch_macos.py").read_text("utf-8") and "D:" not in (HERE / "bootstrap_macos.py").read_text("utf-8")
         passed("Daily Mac launcher/bootstrap contain no D-drive-specific path")
-    report = {"format":1,"executionHost":"Windows CPython 3.14.8","nativeMacExecution":False,"scope":"Pure configuration and mocked parent-worker contract; no PG, Safari, Finder, dyld or libproc execution","checkedAtUTC":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"checks":checks,"hashes":{"launch_macos.py":digest(HERE/"launch_macos.py"),"bootstrap_macos.py":digest(HERE/"bootstrap_macos.py"),"runtime_manager.py":digest(REPO/"app/runtime_manager.py")}}
+    report = {"format":1,"executionHost":"Windows CPython 3.14.8","nativeMacExecution":False,"nativeMacDirectoryApiExecution":False,"directoryBoundary":"Mocked NSFileManager user-domain return values","scope":"Pure configuration, mocked native-directory boundary and mocked parent-worker contract; no PG, Safari, Finder, dyld or libproc execution","checkedAtUTC":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"checks":checks,"hashes":{"launch_macos.py":digest(HERE/"launch_macos.py"),"bootstrap_macos.py":digest(HERE/"bootstrap_macos.py"),"runtime_manager.py":digest(REPO/"app/runtime_manager.py")}}
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n","utf-8")
     print(json.dumps({"contractChecks":len(checks),"passed":True,"nativeMacPassClaimed":False,"output":str(args.output)}))

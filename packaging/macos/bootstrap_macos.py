@@ -76,7 +76,7 @@ def ensure_environment(repo: Path, private_root: Path) -> Path:
     hook = "import ctypes.util\nfrom pathlib import Path\n_original_find_library = ctypes.util.find_library\n_native_libpq = " + repr(str(native)) + "\ndef _find_library(name):\n    if name in ('libpq.dylib', 'pq', 'libpq'):\n        if not Path(_native_libpq).is_file():\n            raise RuntimeError('Application libpq is missing')\n        return _native_libpq\n    return _original_find_library(name)\nctypes.util.find_library = _find_library\n"
     (site / "reference_library_native.py").write_text(hook, "utf-8")
     (site / "reference_library_native.pth").write_text("import reference_library_native\n", "utf-8")
-    check = subprocess.run([str(executable), "-I", "-c", "import psycopg,psycopg_pool,markdown,tzdata,apsw; assert psycopg.pq.__impl__ == 'python'; assert psycopg.pq.version() == 180006; assert apsw.sqlitelibversion() == '3.54.0'; assert markdown.__version__ == '3.11'"], env=env, capture_output=True, text=True, encoding="utf-8", timeout=30)
+    check = subprocess.run([str(executable), "-I", "-c", "import psycopg,psycopg_pool,markdown,tzdata,apsw; assert psycopg.pq.__impl__ == 'python'; assert psycopg.pq.version() == 180006; assert apsw.sqlitelibversion() == '3.54.0'; assert markdown.__version__ == '3.11.1'"], env=env, capture_output=True, text=True, encoding="utf-8", timeout=30)
     (logs / "native-dependency-check.log").write_text(check.stdout + check.stderr, "utf-8")
     if check.returncode:
         raise RuntimeError("Mac 原生依赖载入失败；详情见私有运行日志。")

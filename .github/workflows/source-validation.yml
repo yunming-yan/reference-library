@@ -1,0 +1,49 @@
+name: Source validation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic-source:
+    name: ${{ matrix.os }} / Python 3.14 / source only
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      PYTHONUTF8: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      REFERENCE_LIBRARY_CI_ROOT: ${{ runner.temp }}
+    steps:
+      - name: Checkout source without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up supported standard CPython
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+          check-latest: true
+      - name: Set up development syntax checker
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          check-latest: true
+          package-manager-cache: false
+      - name: Install fixed source-test dependencies
+        run: python -m pip install --only-binary=:all: -r tests/source-ci-requirements.txt
+      - name: Check syntax and synthetic ZIP/original/cache contracts
+        run: python -B tests/run_source_validation.py
+        # macOS here tests source only. Finder/Safari, native PostgreSQL,
+        # packaging, signing and performance require separate native evidence.

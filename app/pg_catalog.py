@@ -9,6 +9,7 @@ including NUL, punctuation and non-normalized Unicode.
 from __future__ import annotations
 
 import base64
+from collections import OrderedDict
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -148,6 +149,10 @@ class Catalog:
         if not dsn:
             raise CatalogError('PostgreSQL connection configuration is required.', 503)
         self._bulk_state = threading.local()
+        self._list_cache_lock = threading.Lock()
+        self._list_generation = -1
+        self._list_summary = None
+        self._list_counts = OrderedDict()
         self._instance_id = os.environ.get('REFERENCE_LIBRARY_INSTANCE_ID') or str(uuid.uuid4())
         self._dsn = dsn
         self.pool = ConnectionPool(conninfo=dsn, min_size=min_size, max_size=max_size,
@@ -1036,6 +1041,81 @@ class Catalog:
             seen += width
         return re.sub(r'\s+', ' ', text[max(0, original_pos - 40):original_pos + 120]), original_pos
 
+    def _listing_summary(self, conn, generation):
+        # Every report/category/trash mutation advances catalog generation.
+        # A summary is published only for that exact repeatable-read snapshot;
+        # an older in-flight reader cannot replace a newer published generation.
+        with self._list_cache_lock:
+            if generation == self._list_generation and self._list_summary is not None:
+                return self._list_summary
+            if generation > self._list_generation:
+                self._list_generation = generation
+                self._list_summary = None
+                self._list_counts.clear()
+        groups = list(conn.execute(
+            'SELECT category,category_fold,count(*) FILTER(WHERE trashed_at IS NULL) AS active_count,'
+            'count(*) FILTER(WHERE trashed_at IS NOT NULL) AS trash_count '
+            'FROM rl_reports WHERE NOT purge_pending GROUP BY category,category_fold'))
+        total = trash_total = 0
+        categories = set()
+        category_counts = {}
+        for row in groups:
+            active, deleted = row['active_count'], row['trash_count']
+            total += active
+            trash_total += deleted
+            folded = bytes(row['category_fold'])
+            previous = category_counts.get(folded, (0, 0))
+            category_counts[folded] = (previous[0] + active, previous[1] + deleted)
+            if active and row['category']:
+                categories.add(row['category'])
+        summary = ({'total': total, 'trash_total': trash_total},
+                   tuple(sorted(categories, key=lambda value: (value.casefold(), value))), category_counts)
+        with self._list_cache_lock:
+            if generation == self._list_generation:
+                self._list_summary = summary
+        return summary
+
+    def _cached_count(self, generation, query, category, trash):
+        key = (query.casefold(), category.casefold(), trash)
+        with self._list_cache_lock:
+            if generation != self._list_generation or key not in self._list_counts:
+                return None
+            value = self._list_counts[key]
+            self._list_counts.move_to_end(key)
+            return value
+
+    def _remember_count(self, generation, query, category, trash, value):
+        key = (query.casefold(), category.casefold(), trash)
+        with self._list_cache_lock:
+            if generation != self._list_generation:
+                return
+            self._list_counts[key] = value
+            self._list_counts.move_to_end(key)
+            while len(self._list_counts) > 128:
+                self._list_counts.popitem(last=False)
+
+    def _ordered_page_match(self, query):
+        # For a broad result, test only ordered candidate reports. LIMIT inside
+        # the correlated scalar subquery prevents an all-library materialization.
+        # These are exactly the predicates used by _search_cte, over both kinds.
+        folded = query.casefold()
+        needle = folded.encode('utf-8')
+        if len(folded) <= 2:
+            return (
+                '(SELECT true FROM rl_search_chunks c JOIN rl_short_postings sp USING(chunk_id) '
+                'WHERE c.report_id=r.report_id AND sp.gram=%s LIMIT 1) IS TRUE', [needle])
+        if '\x00' not in folded and re.search(r'[a-z0-9]{3}', folded):
+            pattern = '%' + folded.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_') + '%'
+            return (
+                "(SELECT true FROM rl_search_chunks c WHERE c.report_id=r.report_id "
+                "AND c.index_text LIKE %s ESCAPE E'\\\\' AND position(%s::bytea in c.folded_text)>0 "
+                "LIMIT 1) IS TRUE", [pattern, needle])
+        gram = folded[:min(2, len(folded))].encode('utf-8')
+        return (
+            '(SELECT true FROM rl_search_chunks c JOIN rl_short_postings sp USING(chunk_id) '
+            'WHERE c.report_id=r.report_id AND sp.gram=%s AND position(%s::bytea in c.folded_text)>0 '
+            'LIMIT 1) IS TRUE', [gram, needle])
+
     def list_reports(self, query='', category='', trash=False, offset=0, limit=50, cursor=None, generation=None):
         started = time.perf_counter()
         if not isinstance(query, str) or len(query) > MAX_QUERY:
@@ -1060,17 +1140,29 @@ class Catalog:
             state = conn.execute('SELECT generation FROM rl_state WHERE singleton').fetchone()
             self._guard(state, generation)
             keys = self._read_cursor(cursor, query, category, trash, state['generation']) if cursor else None
-            counts = conn.execute('SELECT count(*) FILTER(WHERE trashed_at IS NULL) AS total,count(*) FILTER(WHERE trashed_at IS NOT NULL) AS trash_total FROM rl_reports WHERE NOT purge_pending').fetchone()
-            categories = [r['category'] for r in conn.execute("SELECT DISTINCT category FROM rl_reports WHERE NOT purge_pending AND trashed_at IS NULL AND category<>'' ORDER BY category")]
+            counts, categories, category_counts = self._listing_summary(conn, state['generation'])
+            scope_counts = category_counts.get(category.casefold().encode('utf-8'), (0, 0)) if category else (counts['total'], counts['trash_total'])
+            scope_total = scope_counts[int(trash)]
             count_start = time.perf_counter()
-            filtered_count = conn.execute(cte + 'SELECT count(*) AS n FROM rl_reports r' + matched + where, search_params + filter_params, prepare=False).fetchone()['n']
+            filtered_count = scope_total if not query else self._cached_count(state['generation'], query, category, trash)
+            if filtered_count is None:
+                filtered_count = conn.execute(cte + 'SELECT count(*) AS n FROM rl_reports r' + matched + where, search_params + filter_params, prepare=False).fetchone()['n']
+                self._remember_count(state['generation'], query, category, trash, filtered_count)
             count_ms = (time.perf_counter() - count_start) * 1000
             page_where = where
+            page_cte, page_matched = cte, matched
             page_params = search_params + filter_params
+            page_route = 'materialized-matches' if query else 'ordered-index'
+            if query and filtered_count >= max(200, (scope_total + 19) // 20):
+                predicate, exact_params = self._ordered_page_match(query)
+                page_where += ' AND ' + predicate
+                page_cte, page_matched = '', ' '
+                page_params = filter_params + exact_params
+                page_route = 'ordered-exact-match'
             if keys:
                 page_where += ' AND (r.report_date,r.issue,r.imported_at,r.report_id)<(%s,%s,%s,%s)'
                 page_params += keys
-            page_sql = cte + 'SELECT r.*,p.object_id,p.blocked FROM rl_reports r JOIN rl_packages p USING(package_id)' + matched + page_where + ' ORDER BY r.report_date DESC,r.issue DESC,r.imported_at DESC,r.report_id DESC LIMIT %s'
+            page_sql = page_cte + 'SELECT r.*,p.object_id,p.blocked FROM rl_reports r JOIN rl_packages p USING(package_id)' + page_matched + page_where + ' ORDER BY r.purge_pending,(r.trashed_at IS NOT NULL),r.report_date DESC,r.issue DESC,r.imported_at DESC,r.report_id DESC LIMIT %s'
             page_params.append(limit + 1)
             if offset:
                 page_sql += ' OFFSET %s'
@@ -1097,9 +1189,9 @@ class Catalog:
             return {'reports': reports, 'total': counts['total'], 'trashTotal': counts['trash_total'],
                 'filteredCount': filtered_count, 'categories': sorted(categories, key=str.casefold),
                 'generation': state['generation'], 'nextCursor': next_cursor, 'hasMore': has_more,
-                'offset': offset, 'limit': limit, 'countMode': 'exact', 'searchRoute': route,
+                'offset': offset, 'limit': limit, 'countMode': 'exact', 'searchRoute': route, 'pageRoute': page_route,
                 'countMs': round(count_ms, 3), 'elapsedMs': round((time.perf_counter() - started) * 1000, 3),
-                'countCost': 'Exact count visits all indexed matches; longer queries verify candidates. Page summaries are bounded by limit.'}
+                'countCost': 'Exact counts belong to this catalog generation and may be reused. New queries verify all indexed candidates; ordered page summaries are bounded by limit.'}
 
     def explain_search(self, query, category='', trash=False):
         cte, params, route = self._search_cte(query)

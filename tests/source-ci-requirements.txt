@@ -1,0 +1,9 @@
+# CI imports only. Product startup continues to use its offline platform wheels.
+# Versions mirror the release lock; binary psycopg is CI-only module support.
+# No PostgreSQL service or private connection configuration is installed by CI.
+psycopg[binary]==3.3.6
+psycopg-pool==3.3.3
+typing-extensions==4.16.0
+tzdata==2026.5
+apsw==3.54.0.0
+Markdown==3.11.1

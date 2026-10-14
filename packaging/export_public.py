@@ -7,7 +7,7 @@ from pathlib import Path
 REPARSE=getattr(stat,"FILE_ATTRIBUTE_REPARSE_POINT",0x400)
 ROOT_FILES={"README.md","LICENSE",".gitignore","launch.py","打开综合资料库.vbs","关闭综合资料库.vbs"}
 APP_FILES={"bootstrap.py","cache_sqlite.py","ingest.py","maintenance.py","original_store.py","pg_catalog.py","runtime_manager.py","server.py"}
-TEST_FILES={"test_backend_api.py","test_backend_pg_http.py","test_cache_sqlite.py"}
+TEST_FILES={"test_backend_api.py","test_backend_pg_http.py","test_cache_sqlite.py","test_listing_pg_cache.py","test_platform_directories.py","run_source_validation.py","source-ci-requirements.txt"}
 MAC_FILES={"bootstrap_macos.py","launch_macos.py","server_entry.py","build_app.py","native_smoke.py","build_native_driver.py","launcher.sh","sign_and_notarize.sh","refresh_signed_manifests.py","build_psycopg_c.sh","download_verified.py","download_wheels.py","download_native_build_inputs.py","runtime_audit.py","extract_runtime.py","compare_driver_performance.py","build_native_pg.sh","test_machine_contract.py","native-pg-version-lock.json"}
 PROVENANCE_FILES={"release/windows-runtime-dependencies.json","release/psycopg-c-build.json","release/WINDOWS_RUNTIME.md","release/WINDOWS_NATIVE_BUILD.md","release/windows-native-build-lock.json","app/vendor/markdown-manifest.json"}
 RUNTIME_PLATFORMS={"windows-x64","macos-universal2"}
@@ -36,6 +36,7 @@ def allowed(relative):
     parts=relative.parts; name=parts[-1]
     if any(part.casefold() in SENSITIVE_PARTS for part in parts): return False,"sensitive or disposable directory"
     if relative.suffix.casefold() in FORBIDDEN_SUFFIXES or ".so." in name: return False,"binary or build artifact belongs in platform package"
+    if relative.as_posix()==".github/workflows/source-validation.yml":return True,""
     if len(parts)==1:return name in ROOT_FILES,"root file is not allowlisted"
     if parts[0]=="app":
         if len(parts)==2:return name in APP_FILES,"legacy app file is not allowlisted"
@@ -153,6 +154,7 @@ def export(source,output,evidence):
         except (ValueError,UnicodeError,OSError,SyntaxError) as exc:
             failures.append({"path":relative.as_posix(),"reason":str(exc)})
     required={"README.md","LICENSE",".gitignore","launch.py","app/server.py","app/ingest.py","app/original_store.py","app/pg_catalog.py","app/runtime_manager.py","app/bootstrap.py","packaging/export_public.py"}
+    required.update({".github/workflows/source-validation.yml","tests/run_source_validation.py","tests/source-ci-requirements.txt","tests/test_listing_pg_cache.py","tests/test_platform_directories.py"})
     missing=sorted(required-{item["path"] for item in accepted})
     if missing:failures.append({"path":"<required-files>","reason":"Missing: "+", ".join(missing)})
     combined=hashlib.sha256()

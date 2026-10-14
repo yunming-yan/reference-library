@@ -39,6 +39,111 @@ def private_acl(path):
         path.chmod(0o700 if path.is_dir() else 0o600)
 
 
+def _windows_local_appdata():
+    """Read the current user's Known Folder; never create or redirect it."""
+    import ctypes
+
+    class GUID(ctypes.Structure):
+        _fields_ = [('Data1', ctypes.c_uint32), ('Data2', ctypes.c_uint16),
+                    ('Data3', ctypes.c_uint16), ('Data4', ctypes.c_ubyte * 8)]
+
+    # FOLDERID_LocalAppData; flags 0 use the current (possibly redirected) path.
+    # https://learn.microsoft.com/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderpath
+    folder = GUID.from_buffer_copy(uuid.UUID('F1B32785-6FBA-4FCF-9D55-7B8E7F157091').bytes_le)
+    shell = ctypes.WinDLL('shell32', winmode=0x00000800)  # system DLLs only
+    ole = ctypes.WinDLL('ole32', winmode=0x00000800)
+    lookup = shell.SHGetKnownFolderPath
+    lookup.argtypes = [ctypes.POINTER(GUID), ctypes.c_uint32,
+                       ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
+    lookup.restype = ctypes.c_int32
+    release = ole.CoTaskMemFree
+    release.argtypes = [ctypes.c_void_p]
+    release.restype = None
+    allocated = ctypes.c_void_p()
+    try:
+        result = lookup(ctypes.byref(folder), 0, None, ctypes.byref(allocated))
+        if result != 0 or not allocated.value:
+            raise OSError('SHGetKnownFolderPath could not resolve LocalAppData.')
+        return Path(ctypes.wstring_at(allocated.value))
+    finally:
+        # Microsoft requires freeing the output even when the lookup fails.
+        if allocated.value:
+            release(allocated)
+
+
+def _mac_user_directories():
+    """Read NSFileManager user-domain Application Support and Caches URLs."""
+    import ctypes
+
+    # The OS frameworks are present on supported macOS; no PyObjC dependency.
+    foundation = ctypes.CDLL('/System/Library/Frameworks/Foundation.framework/Foundation')
+    objc = ctypes.CDLL('/usr/lib/libobjc.A.dylib')
+    objc.objc_getClass.argtypes = [ctypes.c_char_p]
+    objc.objc_getClass.restype = ctypes.c_void_p
+    objc.sel_registerName.argtypes = [ctypes.c_char_p]
+    objc.sel_registerName.restype = ctypes.c_void_p
+    address = ctypes.cast(objc.objc_msgSend, ctypes.c_void_p).value
+    # Each message has its own ABI signature; no shared mutable argtypes.
+    message = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p)(address)
+    directories = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+                                   ctypes.c_size_t, ctypes.c_size_t)(address)
+    count = ctypes.CFUNCTYPE(ctypes.c_size_t, ctypes.c_void_p, ctypes.c_void_p)(address)
+    file_url = ctypes.CFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)(address)
+    representation = ctypes.CFUNCTYPE(ctypes.c_char_p, ctypes.c_void_p, ctypes.c_void_p)(address)
+    drain = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)(address)
+    selector = objc.sel_registerName
+    pool_class = objc.objc_getClass(b'NSAutoreleasePool')
+    manager_class = objc.objc_getClass(b'NSFileManager')
+    if not pool_class or not manager_class:
+        raise OSError('Foundation directory classes are unavailable.')
+    pool = message(message(pool_class, selector(b'alloc')), selector(b'init'))
+    if not pool:
+        raise OSError('Foundation autorelease pool could not be created.')
+    try:
+        manager = message(manager_class, selector(b'defaultManager'))
+        if not manager:
+            raise OSError('NSFileManager is unavailable.')
+        values = []
+        # NSApplicationSupportDirectory=14, NSCachesDirectory=13;
+        # NSUserDomainMask=1. URLsForDirectory does not create the directory.
+        # https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/AccessingFilesandDirectories/AccessingFilesandDirectories.html
+        for directory in (14, 13):
+            urls = directories(manager, selector(b'URLsForDirectory:inDomains:'), directory, 1)
+            if not urls or count(urls, selector(b'count')) < 1:
+                raise OSError('Foundation did not return a user directory.')
+            url = message(urls, selector(b'firstObject'))
+            if not url or not file_url(url, selector(b'isFileURL')):
+                raise OSError('Foundation returned an invalid directory URL.')
+            raw = representation(url, selector(b'fileSystemRepresentation'))
+            if not raw:
+                raise OSError('Foundation directory has no filesystem representation.')
+            values.append(Path(os.fsdecode(raw)))  # copy before the pool drains
+        return tuple(values)
+    finally:
+        drain(pool, selector(b'drain'))
+
+
+def _default_user_directories():
+    """Native first-use roots; an existing explicit profile bypasses this."""
+    try:
+        if sys.platform == 'darwin':
+            support, cache = _mac_user_directories()
+        elif os.name == 'nt':
+            support = cache = _windows_local_appdata()
+        else:
+            raise OSError('Automatic folders require Windows or macOS.')
+        # Keep the existing absolute/plain-path guard for native results too.
+        support = MachineConfig._absolute(str(support), 'systemApplicationSupport')
+        cache = MachineConfig._absolute(str(cache), 'systemCaches')
+        if any(path.exists() and not path.is_dir() for path in (support, cache)):
+            raise OSError('A system directory is not a directory.')
+        return support, cache
+    except (OSError, AttributeError, ValueError, RuntimeError) as error:
+        # Guessing HOME/environment here could create a second empty library.
+        # Existing/custom machine profiles are loaded before this function.
+        raise RuntimeError('系统未能解析资料目录。请使用明确指定目录的机器配置继续启动。') from error
+
+
 class MachineConfig:
     def __init__(self, repo, path=None):
         self.repo = self._absolute(str(Path(repo).absolute()), "programRoot")
@@ -49,15 +154,15 @@ class MachineConfig:
         if self.config_path.exists():
             value = json.loads(self.config_path.read_text(encoding="utf-8"))
         else:
+            support, cache = _default_user_directories()
+            base = support / "ReferenceLibrary"
             if sys.platform == "darwin":
-                base = Path.home() / "Library" / "Application Support" / "ReferenceLibrary"
                 data = base / "Library"
                 existing = data / MARKER
                 identity = json.loads(existing.read_text(encoding="utf-8"))["libraryId"] if existing.exists() else str(uuid.uuid4())
-                value = {"privateStateRoot": str(base / "Runtime" / identity), "dataRoot": str(data), "cacheRoot": str(Path.home() / "Library" / "Caches" / "ReferenceLibrary" / identity), "initialLibraryId": identity, "appPort": 18761, "pgPort": 18762}
+                value = {"privateStateRoot": str(base / "Runtime" / identity), "dataRoot": str(data), "cacheRoot": str(cache / "ReferenceLibrary" / identity), "initialLibraryId": identity, "appPort": 18761, "pgPort": 18762}
             else:
-                base = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "ReferenceLibrary"
-                value = {"privateStateRoot": str(base / "runtime"), "dataRoot": str(base / "library"), "appPort": 18761, "pgPort": 18762}
+                value = {"privateStateRoot": str(base / "runtime"), "dataRoot": str(base / "library"), "cacheRoot": str(cache / "ReferenceLibrary" / "cache"), "appPort": 18761, "pgPort": 18762}
         self.initial_library_id = value.get("initialLibraryId")
         self.private_root = self._absolute(value.get("privateStateRoot"), "privateStateRoot")
         self.data_root = self._absolute(value.get("dataRoot"), "dataRoot")

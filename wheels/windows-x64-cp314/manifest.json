@@ -67,5 +67,16 @@
     "pythonRequires": ">=3.10",
     "build": "Local unmodified upstream sdist, MSVC14.51.36231, CPython3.14.8 x64, PostgreSQL18.6 libpq; build source requirements pin setuptools83.0.0",
     "linkedLibpqVersion": "18.6"
+  },
+  {
+    "package": "Markdown",
+    "version": "3.11.1",
+    "filename": "markdown-3.11.1-py3-none-any.whl",
+    "bytes": 116774,
+    "sha256": "f1fa378ba5d682900c9ecb55ccceacca936016dda7c3b27097e8ae03ff78feb5",
+    "url": "https://files.pythonhosted.org/packages/75/e6/1c7b7a48aa3f2c2a5d3c71a6c9c90a6c8c2903e5c73663b5f5e38f87257f/markdown-3.11.1-py3-none-any.whl",
+    "sourcePage": "https://pypi.org/project/Markdown/3.11.1/",
+    "license": "BSD-3-Clause",
+    "pythonRequires": ">=3.11"
   }
 ]

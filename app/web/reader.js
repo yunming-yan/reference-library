@@ -84,18 +84,33 @@
       restoreBookmark(bookmark);
     }));
   }
-  function clearBookmark() {layoutVersion++; pendingBookmark = null;}
+  function clearBookmark() {layoutVersion++; pendingBookmark = null; cancelPanelAnimations();}
   const panelAnimations = new Map();
-  function animatePanel(kind, opening) {
+  function cancelPanelAnimation(kind) {
     const prior = panelAnimations.get(kind);
-    if (prior) {prior.animation?.cancel(); prior.ghost?.remove(); panelAnimations.delete(kind);}
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!prior) return;
+    if (prior.frame !== undefined) cancelAnimationFrame(prior.frame);
+    prior.animation?.cancel(); prior.ghost?.remove(); panelAnimations.delete(kind);
+  }
+  function cancelPanelAnimations() {for (const kind of [...panelAnimations.keys()]) cancelPanelAnimation(kind);}
+  const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+  motionPreference.addEventListener('change', event => {if (event.matches) cancelPanelAnimations();});
+  function animatePanel(kind, opening) {
+    cancelPanelAnimation(kind);
+    if (motionPreference.matches) return;
     const node = panel(kind);
     if (opening) {
-      requestAnimationFrame(() => {
-        if (!visible(kind)) return;
-        const animation = node.animate([{opacity:.4, transform:`translateX(${kind === 'library' ? -6 : 6}px)`},{opacity:1,transform:'none'}], {duration:160,easing:'cubic-bezier(.2,.7,.25,1)'});
-        panelAnimations.set(kind,{animation});
+      const record = {};
+      // Register before the frame: a reverse action cancels both pending and running motion.
+      panelAnimations.set(kind, record);
+      record.frame = requestAnimationFrame(() => {
+        if (panelAnimations.get(kind) !== record || !visible(kind) || motionPreference.matches) {
+          if (panelAnimations.get(kind) === record) panelAnimations.delete(kind);
+          return;
+        }
+        delete record.frame;
+        record.animation = node.animate([{opacity:.4, transform:'translateX('+(kind === 'library' ? -6 : 6)+'px)'},{opacity:1,transform:'none'}], {duration:160,easing:'cubic-bezier(.2,.7,.25,1)'});
+        record.animation.finished.catch(()=>{}).finally(()=>{if (panelAnimations.get(kind) === record) panelAnimations.delete(kind);});
       });
       return;
     }
@@ -108,9 +123,9 @@
     ghost.inert=true;ghost.setAttribute('aria-hidden','true');
     Object.assign(ghost.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',display:kind==='library'?'flex':'block',pointerEvents:'none',zIndex:'44',margin:'0',maxHeight:'none'});
     document.body.append(ghost);
-    const animation = ghost.animate([{opacity:.8,transform:'none'},{opacity:0,transform:`translateX(${kind === 'library' ? -12 : 12}px)`}],{duration:140,easing:'cubic-bezier(.2,.7,.25,1)'});
-    panelAnimations.set(kind,{animation,ghost});
-    animation.finished.catch(()=>{}).finally(()=>{ghost.remove();if(panelAnimations.get(kind)?.animation===animation)panelAnimations.delete(kind)});
+    const animation = ghost.animate([{opacity:.8,transform:'none'},{opacity:0,transform:'translateX('+(kind === 'library' ? -12 : 12)+'px)'}],{duration:140,easing:'cubic-bezier(.2,.7,.25,1)'});
+    const record = {animation,ghost}; panelAnimations.set(kind,record);
+    animation.finished.catch(()=>{}).finally(()=>{ghost.remove();if(panelAnimations.get(kind)===record)panelAnimations.delete(kind)});
   }
   function visible(kind) {
     if (isDrawer(kind)) return drawer === kind;
@@ -148,7 +163,7 @@
     if (byId('readingSettings')) byId('readingSettings').setAttribute('aria-busy', String(!initialized));
   }
   function persist() {
-    if (serviceCapabilities.preferences !== true) return Promise.resolve();
+    if (!canMutate('preferences')) return Promise.resolve();
     const snapshot = copy(reading), version = ++saveVersion;
     saveChain = saveChain.then(async () => {
       try {
@@ -182,12 +197,14 @@
   function toggleFocus() {
     if (!initialized || !isReader()) return;
     closeDrawer(false);
+    const restoringPanels = reading.focus;
     if (!reading.focus) {if (visible('library')) animatePanel('library', false); if (visible('toc')) animatePanel('toc', false);}
     preservePosition(() => {
       if (reading.focus) leaveFocus();
       else {reading.focusRestore = {library: reading.library, toc: reading.toc}; reading.focus = true;}
       applyReading();
     });
+    if (restoringPanels) {if (visible('library')) animatePanel('library', true); if (visible('toc')) animatePanel('toc', true);}
     persist();
   }
   function setBackgroundInert(activePanel) {

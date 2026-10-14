@@ -36,7 +36,7 @@ PG 核心 Mach-O 的最低系统标记为 macOS 13.0，APSW wheels 分别标记 
 | Psycopg | 3.3.6，pure Python fallback，绑定本应用 libpq 18.6 |
 | Psycopg Pool | 3.3.3 |
 | APSW / SQLite | 3.54.0.0 / 3.54.0，官方 cp314 各架构原生 wheel |
-| Python-Markdown | 3.11 |
+| Python-Markdown | 3.11.1 |
 | typing_extensions | 4.16.0 |
 | tzdata | 2026.5 |
 | EDB 内含 OpenSSL | 3.5.9：当前 3.5 LTS 维护版；整体最新稳定版为 4.0.3 |

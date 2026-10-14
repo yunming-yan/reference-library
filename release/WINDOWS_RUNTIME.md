@@ -1,10 +1,10 @@
 # Windows 离线运行时
 
-2026-10-13 官方稳定版本锁定：PostgreSQL 18.6、OpenSSL 4.0.3、ICU 78.3、zlib 1.3.2、LZ4 1.10.0、Zstandard 1.5.7、IANA 时区 2026e、Microsoft VC Runtime 14.51.36247.0。PostgreSQL 使用官方源码在隔离目录原生构建，ICU 使用官方 x64 SDK，其他列出的原生库使用官方源码构建；没有把 EDB 旧 DLL 的版本写成最新版本。
+2026-10-14 官方稳定版本复核锁定：PostgreSQL 18.6、OpenSSL 4.0.3、ICU 78.3、zlib 1.3.2、LZ4 1.10.0、Zstandard 1.5.7、IANA 时区 2026e、Microsoft VC Runtime 14.51.36247.0。PostgreSQL 使用官方源码在隔离目录原生构建，ICU 使用官方 x64 SDK，其他列出的原生库使用官方源码构建；没有把 EDB 旧 DLL 的版本写成最新版本。
 
-Python 离线依赖为 psycopg / psycopg-c 3.3.6、psycopg-pool 3.3.3、APSW 3.54.0.0（内含 SQLite 3.54.0）、tzdata 2026.5、typing-extensions 4.16.0；Markdown 3.11 的源文件及许可证随应用保存。CPython 3.14.8 x64、Windows 系统 DLL/UCRT 和已安装浏览器由本机提供。固定的发布版本不会在日常启动时自动联网更新。这里的“最新”指这次核实并锁定的应用依赖，不声明 Windows 或 Python 内部所有组件均由本程序更新。
+Python 离线依赖为 psycopg / psycopg-c 3.3.6、psycopg-pool 3.3.3、APSW 3.54.0.0（内含 SQLite 3.54.0）、tzdata 2026.5、typing-extensions 4.16.0；Markdown 3.11.1 的源文件、许可证和离线 wheel 随应用保存。CPython 3.14.8 x64、Windows 系统 DLL/UCRT 和已安装浏览器由本机提供。固定的发布版本不会在日常启动时自动联网更新。这里的“最新”指这次核实并锁定的应用依赖，不声明 Windows 或 Python 内部所有组件均由本程序更新。
 
-双击“打开综合资料库.vbs”，启动器探测本机标准 Python，在 StateRoot 建立与 Python 版本、程序位置及依赖锁绑定的 venv，并通过 `--no-index --require-hashes` 从本地 wheels 安装。首次校验 PostgreSQL 逐文件 SHA-256，随后仅在清单指纹及文件属性均未变化时复用验证缓存。程序位置或 Python 变化会重建本机 venv，发布包不搬运另一台机器的 venv。无需用户安装 Node、Docker、pip 或编译器，也不捆绑 Python 或浏览器。
+双击“打开综合资料库.vbs”，启动器探测本机标准 Python，在 StateRoot 建立与 Python 版本、程序位置、依赖锁及私有原生加载器源码绑定的 venv，并通过 `--no-index --require-hashes` 从本地 wheels 安装。首次校验 PostgreSQL 逐文件 SHA-256，随后仅在清单指纹及文件属性均未变化时复用验证缓存。程序位置或 Python 变化会重建本机 venv，发布包不搬运另一台机器的 venv。无需用户安装 Node、Docker、pip 或编译器，也不捆绑 Python 或浏览器。
 
 打开和关闭 VBS 都接受可选的一个绝对、已存在的私有 machine JSON 路径，等价于 `launch.py start/stop --machine <path>`。无参数时使用标准首次配置。快捷方式可把持久的 machine JSON 路径作为 VBS 第二个参数传给 wscript。显式指定的配置不存在时拒绝启动，不会另开默认空库。
 
@@ -21,3 +21,5 @@ ProgramRoot 是解压位置；LibraryRoot、StateRoot、CacheRoot 必须是互�
 运行时 `licenses/` 与应用 `licenses/` 保留 PostgreSQL、Unicode、OpenSSL、压缩库、驱动及 Microsoft 原始许可证和 notices。源码发布不包含数据库二进制、wheels、CRT、配置、PGDATA、venv、原件或私有日志。**公开二进制再分发仍须满足 Microsoft Runtime License 的授权和分发条件**；已有 BuildTools 不能单独证明 Visual Studio Products 许可。私有本机包已经完成验证，该验证不等于确认公开 CRT 再分发权利。构建锁明确区分发布者 checksum 与仅本地计算的 hash，不把校验值称为签名。
 
 PostgreSQL 启动最多等待 5 分钟，正常就绪立即返回，并非固定等待；恢复超过上限时先查看私有日志并稍后重试，严格所有权检查不会跳过。
+
+私有 venv 的原生扩展与应用 DLL 加载使用 Windows extended-length 绝对路径。加载器源码 SHA-256 参与环境指纹，修改加载器会创建新私有环境并保留旧环境；复用时核对加载器及 .pth 字节。此处理不改主机 Python、注册表或全局 PATH，也不宣称所有 Windows shell/数据库路径都无长度限制。
