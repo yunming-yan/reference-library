@@ -1,6 +1,6 @@
 """Focused platform directory contracts; mocks do not claim native macOS QA."""
 from __future__ import annotations
-from contextlib import ExitStack
+from contextlib import ExitStack, contextmanager
 import ctypes
 import importlib.util
 import json
@@ -109,9 +109,13 @@ class PlatformDirectoryTests(unittest.TestCase):
         where.write_text(json.dumps(data), encoding='utf-8')
         return where, data
 
+    @contextmanager
     def windows(self):
-        # Patch this module's OS adapter, not global os.name/pathlib's platform.
-        return patch.object(rm, 'os', SimpleNamespace(name='nt', environ=dict(os.environ), fsdecode=os.fsdecode, replace=os.replace))
+        # Fix both dispatch inputs locally without changing the host OS or Path.
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(rm, 'os', SimpleNamespace(name='nt', environ=dict(os.environ), fsdecode=os.fsdecode, replace=os.replace)))
+            stack.enter_context(patch.object(rm, 'sys', SimpleNamespace(platform='win32')))
+            yield
 
     def call_windows_api(self, fake):
         with patch('ctypes.WinDLL', fake.load, create=True):
