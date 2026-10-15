@@ -6,11 +6,11 @@
   const controls = ['toggleLibrary', 'toggleToc', 'focusButton', 'headerNav', 'readingSize', 'readingWidth', 'readingLineHeight'];
   const defaults = {library: true, toc: true, fontSize: 18, width: 'balanced', lineHeight: 1.8, focus: false, focusRestore: {library: true, toc: true}};
   const copy = value => JSON.parse(JSON.stringify(value));
-  const widths = {narrow: '740px', balanced: '840px', wide: '1040px'};
+  const widths = {narrow: '760px', balanced: '1100px', wide: '1240px'};
   let reading = copy(defaults), committed = copy(defaults), initialized = false;
   let drawer = null, drawerOpener = null, inertState = [], panelState = null;
   let saveChain = Promise.resolve(), saveVersion = 0, layoutVersion = 0, pendingBookmark = null;
-  let desktopMenus = innerWidth > 700;
+  let desktopMenus = false;
   const isReader = () => !!current && !byId('readerView').hidden;
   const isSource = () => isReader() && currentMode === 'source';
   const isDrawer = kind => innerWidth <= (kind === 'library' ? 980 : 1240);
@@ -28,7 +28,7 @@
     return result;
   };
   const toolbarBottom = () => {
-    const header = document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0;
+    const header = root.dataset.page === 'reader' ? 0 : document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0;
     const tools = isReader() ? document.querySelector('.reader-toolbar')?.getBoundingClientRect() : null;
     return Math.max(0, header, tools && tools.top <= header + 2 ? tools.bottom : header);
   };
@@ -139,8 +139,8 @@
     button.title = title; button.setAttribute('aria-label', title);
   }
   function applyReading() {
-    if (innerWidth > 700 && byId('readerMore')) byId('readerMore').open = true;
-    const active = isReader(), source = isSource(), focus = active && reading.focus;
+    // The compact toolbar keeps secondary actions in an explicit menu at every width.
+    const theme=byId('readerTheme'), themeTarget=innerWidth<=620?document.querySelector('#readerMore>.more-actions'):document.querySelector('.reader-tools');if(theme&&themeTarget&&theme.parentElement!==themeTarget)themeTarget.append(theme);const active = isReader(), source = isSource(), focus = active && reading.focus;
     root.dataset.library = reading.library && !focus ? 'open' : 'closed';
     root.dataset.toc = active && !source && reading.toc && !focus ? 'open' : 'closed';
     root.dataset.focus = String(focus);
@@ -228,11 +228,13 @@
     return [...activePanel.querySelectorAll('a[href],button,input,select,textarea,summary,[tabindex]')]
       .filter(node => !node.disabled && !node.inert && node.tabIndex >= 0 && node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden');
   }
+  const visibleFocusTarget = node => node?.isConnected && !node.inert && !node.disabled && node.matches('button,a[href],summary,input,select,textarea,[tabindex]') && node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden';
+  const visibleController = kind => (kind === 'library' ? [byId('toggleLibrary'),byId('headerNav'),byId('homeNav')] : [byId('toggleToc')]).find(visibleFocusTarget);
   function openDrawer(kind, trigger, search = false) {
     const activePanel = panel(kind);
     if (!activePanel || !isDrawer(kind)) return;
     closeDrawer(false);
-    drawer = kind; drawerOpener = trigger || document.activeElement;
+    drawer = kind; drawerOpener = visibleFocusTarget(trigger) ? trigger : visibleController(kind) || document.activeElement;
     activePanel.classList.add('open');
     document.body.dataset.drawer = kind;
     if (byId('drawerBackdrop')) byId('drawerBackdrop').hidden = false;
@@ -262,7 +264,10 @@
       panelState = null;
     }
     applyReading();
-    if (returnFocus && opener?.isConnected && !opener.inert && opener.getClientRects().length) opener.focus({preventScroll: true});
+    if (returnFocus && !document.querySelector('dialog[open]')) {
+      const target=[opener,visibleController(previous),byId('toggleLibrary'),byId('headerNav'),byId('backHome'),byId('homeButton')].find(visibleFocusTarget);
+      target?.focus({preventScroll:true});
+    }
   }
   function closePanel(kind) {
     if (drawer === kind) {closeDrawer(true); return;}
@@ -313,20 +318,20 @@
     if (event.key === '/' && editable) {event.stopImmediatePropagation(); return;}
     if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && initialized) {
       event.preventDefault(); event.stopImmediatePropagation();
-      if (isDrawer('library')) openDrawer('library', byId('headerNav'), true);
+      if (isDrawer('library')) openDrawer('library', visibleController('library'), true);
       else {
         if (!visible('library')) {preservePosition(() => {leaveFocus(); reading.library = true; applyReading();}); persist();}
         byId('search').focus({preventScroll: true});
       }
     }
     if (event.key === 'Escape') {
-      const menu = byId('readingSettings')?.open ? byId('readingSettings') : innerWidth <= 700 && byId('readerMore')?.open ? byId('readerMore') : null;
+      const menu = byId('readingSettings')?.open ? byId('readingSettings') : byId('readerMore')?.open ? byId('readerMore') : byId('reportIdentity')?.open ? byId('reportIdentity') : null;
       if (menu) {event.preventDefault(); menu.open = false; menu.querySelector('summary')?.focus({preventScroll: true});}
     }
   }, true);
   document.addEventListener('click', event => {
-    const more = byId('readerMore'), settings = byId('readingSettings');
-    if (innerWidth <= 700 && more && (!more.contains(event.target) || event.target.closest('#manageButton,#toBottom,#figuresButton,.export-menu a'))) more.open = false;
+    const more = byId('readerMore'), settings = byId('readingSettings'), identity=byId('reportIdentity'); if(identity&&!identity.contains(event.target))identity.open=false;
+    if (more && (!more.contains(event.target) || event.target.closest('#manageButton,#toBottom,#figuresButton,#readerImport,#readerStorage,#readerTheme,.export-menu a'))) more.open = false;
     if (settings && !settings.contains(event.target)) settings.open = false;
     const chapter = event.target.closest('[data-chapter]');
     if (drawer && chapter) {
@@ -356,6 +361,73 @@
   renderHome = function(...args) {const result = originalRenderHome.apply(this, args); applyReading(); return result;};
   for (const id of ['toggleLibrary', 'headerNav', 'mobileNav', 'homeNav']) byId(id)?.setAttribute('aria-controls', 'libraryPanel');
   byId('toggleToc')?.setAttribute('aria-controls', 'tocPanel');
+  // Native details own semantics and input. Motion is visual-only and never delays open/closed geometry.
+  const menuRecords = new Map(), chromeAnimations = new Set();
+  let chromeFrame = null, chromeVersion = 0;
+  const rectCopy = r => ({left:r.left,top:r.top,width:r.width,height:r.height});
+  const shape = (from,to) => 'translate('+(from.left-to.left)+'px,'+(from.top-to.top)+'px) scale('+Math.max(.02,from.width/to.width)+','+Math.max(.02,from.height/to.height)+')';
+  function cancelMenu(record) {
+    if(record.frame!==undefined)cancelAnimationFrame(record.frame);
+    delete record.frame;record.animation?.cancel();record.animation=null;record.ghost?.remove();record.ghost=null;
+  }
+  function rememberMenu(details) {
+    const record=menuRecords.get(details), surface=details.children[1];
+    if(!record||!details.open||!surface?.getClientRects().length)return;
+    if(!record.animation)record.full=rectCopy(surface.getBoundingClientRect());
+    record.snapshot=surface.cloneNode(true);
+    const css=getComputedStyle(surface);
+    record.appearance={padding:css.padding,background:css.backgroundColor,color:css.color,border:css.border,borderRadius:css.borderRadius,boxShadow:css.boxShadow,display:css.display,flexDirection:css.flexDirection,alignItems:css.alignItems,gap:css.gap};
+    record.visual=rectCopy(surface.getBoundingClientRect());
+  }
+  const rememberMenus=()=>{for(const details of menuRecords.keys())rememberMenu(details)};
+  document.addEventListener('click',rememberMenus,true);
+  window.addEventListener('keydown',rememberMenus,true);
+  function animateMenu(details) {
+    const record=menuRecords.get(details), surface=details.children[1], trigger=details.firstElementChild;
+    if(!surface||!trigger)return;
+    const interrupted=record.ghost?.isConnected?rectCopy(record.ghost.getBoundingClientRect()):null;
+    const priorVisual=record.visual;
+    cancelMenu(record);surface.style.animation='none';surface.style.transformOrigin='0 0';
+    if(motionPreference.matches){if(details.open)rememberMenu(details);return}
+    if(details.open) {
+      const full=rectCopy(surface.getBoundingClientRect());if(!full.width||!full.height)return;
+      record.full=full;rememberMenu(details);
+      const from=interrupted||rectCopy(trigger.getBoundingClientRect());
+      const animation=surface.animate([{transform:shape(from,full),opacity:.48,borderRadius:'24px'},{transform:'none',opacity:1,borderRadius:'18px'}],{duration:210,easing:'cubic-bezier(.16,1,.3,1)'});
+      record.animation=animation;
+      const track=()=>{if(record.animation!==animation||!details.open)return;record.visual=rectCopy(surface.getBoundingClientRect());record.frame=requestAnimationFrame(track)};
+      track();animation.finished.catch(()=>{}).finally(()=>{if(record.animation===animation){record.animation=null;if(record.frame!==undefined)cancelAnimationFrame(record.frame);delete record.frame;if(details.open)rememberMenu(details)}});
+      return;
+    }
+    const full=record.full;if(!full||!record.snapshot)return;
+    const ghost=record.snapshot.cloneNode(true);ghost.removeAttribute('id');ghost.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));ghost.inert=true;ghost.setAttribute('aria-hidden','true');ghost.classList.add('menu-exit');
+    Object.assign(ghost.style,record.appearance,{position:'fixed',left:full.left+'px',top:full.top+'px',width:full.width+'px',height:full.height+'px',maxHeight:'none',maxWidth:'none',margin:'0',animation:'none',transformOrigin:'0 0',overflow:'hidden',pointerEvents:'none',zIndex:'44'});
+    document.body.append(ghost);record.ghost=ghost;
+    const to=rectCopy(trigger.getBoundingClientRect()), from=priorVisual||full;
+    const animation=ghost.animate([{transform:shape(from,full),opacity:1,borderRadius:'18px'},{transform:shape(to,full),opacity:0,borderRadius:'24px'}],{duration:160,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});record.animation=animation;
+    animation.finished.catch(()=>{}).finally(()=>{ghost.remove();if(record.animation===animation){record.animation=null;record.ghost=null}});
+  }
+  for(const details of [byId('readerMore'),byId('readingSettings'),byId('reportIdentity')].filter(Boolean)) {
+    menuRecords.set(details,{});details.addEventListener('toggle',()=>animateMenu(details));
+  }
+  function cancelChrome() {if(chromeFrame!==null)cancelAnimationFrame(chromeFrame);chromeFrame=null;for(const animation of chromeAnimations)animation.cancel();chromeAnimations.clear()}
+  motionPreference.addEventListener('change',event=>{if(event.matches){chromeVersion++;cancelChrome();for(const record of menuRecords.values())cancelMenu(record)}});
+  window.addEventListener('pagehide',()=>{chromeVersion++;cancelChrome();for(const record of menuRecords.values())cancelMenu(record)});
+  window.archiveReading={pageTransition(next){
+    const prior=root.dataset.page;if(prior===next)return;
+    const pairs=next==='reader'?[['headerNav','toggleLibrary'],['homeButton','reportIdentity'],['themeButton','readerTheme'],['importButton','readerMore']]:[['toggleLibrary','headerNav'],['reportIdentity','homeButton'],['readerTheme','themeButton'],['readerMore','importButton']];
+    const from=pairs.map(([source,target])=>{const node=byId(source),r=node?.getBoundingClientRect();return{target,rect:r?.width?rectCopy(r):null}});
+    const version=++chromeVersion;cancelChrome();for(const [details,record] of menuRecords){cancelMenu(record);details.open=false}
+    if(motionPreference.matches)return;
+    chromeFrame=requestAnimationFrame(()=>{
+      chromeFrame=null;if(version!==chromeVersion||root.dataset.page!==next||motionPreference.matches)return;
+      for(const item of from){const node=byId(item.target);if(!node||!item.rect)continue;const to=node.getBoundingClientRect();if(!to.width||!to.height)continue;
+        const identity=['reportIdentity','homeButton'].includes(item.target),dx=identity?Math.max(-220,Math.min(220,item.rect.left-to.left)):item.rect.left-to.left,dy=item.rect.top-to.top;
+        const transform='translate('+dx+'px,'+dy+'px)'+(identity?'':' scale('+item.rect.width/to.width+','+item.rect.height/to.height+')');
+        const animation=node.animate([{transform,opacity:identity ? .3 : .65},{transform:'none',opacity:1}],{duration:identity?240:220,easing:'cubic-bezier(.16,1,.3,1)'});chromeAnimations.add(animation);animation.finished.catch(()=>{}).finally(()=>chromeAnimations.delete(animation));
+      }
+    });
+  }};
   applyReading();
   Promise.resolve(window.archiveStartup || api('/api/library')).then(data => {reading = normalize(data.settings?.reading); committed = copy(reading);})
     .catch(error => toast('阅读设置暂未读取：' + error.message, 8000))
