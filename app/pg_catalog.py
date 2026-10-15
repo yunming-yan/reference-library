@@ -24,6 +24,8 @@ import time
 import threading
 import uuid
 
+from reading_preferences import FONT_FAMILIES, valid_font_size
+
 import psycopg
 from psycopg.conninfo import make_conninfo
 from psycopg.rows import dict_row
@@ -70,7 +72,7 @@ def _pg_text(value):
 
 def _default_preferences():
     return {'theme': 'light', 'reading': {'library': True, 'toc': True,
-        'fontSize': 18, 'lineHeight': 1.8, 'width': 'balanced', 'focus': False,
+        'fontSize': 18, 'fontFamily': 'system', 'lineHeight': 1.8, 'width': 'balanced', 'focus': False,
         'focusRestore': {'library': True, 'toc': True}}}
 
 
@@ -82,8 +84,10 @@ def _reading(changes):
     for key, value in result.items():
         if key in ('library', 'toc', 'focus') and type(value) is not bool:
             raise CatalogError('Reading panel and focus settings must be boolean.')
-        if key == 'fontSize' and (type(value) is not int or value not in (16, 17, 18, 20, 22)):
+        if key == 'fontSize' and not valid_font_size(value):
             raise CatalogError('Invalid reading font size.')
+        if key == 'fontFamily' and (type(value) is not str or value not in FONT_FAMILIES):
+            raise CatalogError('Invalid reading font family.')
         if key == 'lineHeight' and (type(value) not in (int, float) or value not in (1.6, 1.8, 2.0)):
             raise CatalogError('Invalid reading line height.')
         if key == 'width' and value not in ('narrow', 'balanced', 'wide'):

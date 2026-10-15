@@ -82,3 +82,9 @@ Schema 4 keeps package admission identities separate from current survivor hashe
 Application shutdown pauses accepted imports while retaining their original upload and journal for restart. Startup recovery uses a fixed authority cutoff, two workers and at most eight queued/running Futures. New uploads keep the same bounded admission limit. Explicit cancellation and the current committing phase retain their separate rules.
 
 Migration audits and snapshot inventories belong in the operator's external private output directory. New migrations retain no raw legacy catalog, audit or snapshot projection inside LibraryRoot. Existing prerelease projections require an externally pinned audit and exact-byte ownership registration before purge can remove them; unknown or changed projection files are refused and preserved. Logical backup and restore include the surviving originals and authority state.
+
+## 内置字体与源码构建
+
+完整离线应用内置 MiSans、Noto Sans SC、霞鹜文楷屏幕阅读版、寒蝉全圆体四个家族，字体和连续 12–32 px、0.5 px 步进字号由本地阅读控件选择，应用运行时不下载字体。公开应用源码保留三个 OFL 家族的四份原字体及全部许可；MiSans 两份原 WOFF2 只随完整应用分发，源码通过固定官方来源、ZIP 成员、CRC/字节数/SHA 的构建期 `python packaging/prepare_misans.py` 获取，软件内保留署名。
+
+[字体、许可与可复现构建说明](docs/fonts.md)提供明确的 `source` / `application` 两种导出命令，以及公开 Windows builder 的完整输入流程。公开源码默认不含 MiSans raw 字体、原生运行库、wheel、报告或私有配置；制作完整应用时须使用 `--distribution application`，其六份字体全部经过原件校验。直接使用离线应用包无需运行这些开发命令。

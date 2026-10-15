@@ -1,0 +1,10 @@
+本软件使用 MiSans 字体，由小米主导，联合蒙纳、汉仪共同制作。
+Unmodified font files embedded in the complete application; retain copyright and complete license; acknowledge MiSans in software. Not an independent font repository, font-only archive, resale, sublicense or font service. No adaptation/redevelopment.
+Source: https://hyperos.mi.com/font-download/MiSans.zip
+License: https://hyperos.mi.com/font-download/MiSans%E5%AD%97%E4%BD%93%E7%9F%A5%E8%AF%86%E4%BA%A7%E6%9D%83%E8%AE%B8%E5%8F%AF%E5%8D%8F%E8%AE%AE.pdf
+LICENSE.txt is a text extraction of the unmodified official LICENSE.pdf; the original PDF is authoritative.
+
+Original font copyright notices (preserved in the unchanged fonts):
+Copyright © 2020-2025 Beijing Xiaomi Mobile Software Co.,Ltd. All Rights Reserved.
+
+Project distribution policy: embedded-app-only

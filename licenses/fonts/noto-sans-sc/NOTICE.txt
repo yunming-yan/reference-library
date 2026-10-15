@@ -1,0 +1,10 @@
+Noto Sans SC — Google / Adobe，SIL Open Font License 1.1。
+OFL: retain copyright and license; do not sell font by itself; modified fonts must respect reserved font names; font license does not relicense application. Original bytes bundled.
+Source: https://raw.githubusercontent.com/google/fonts/b7c8331cf620346575487ef8db0e2c729f014675/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf
+License: https://raw.githubusercontent.com/google/fonts/b7c8331cf620346575487ef8db0e2c729f014675/ofl/notosanssc/OFL.txt
+LICENSE.txt is the unchanged official upstream license file.
+
+Original font copyright notices (preserved in the unchanged fonts):
+(c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+
+Project distribution policy: bundled-source-and-app

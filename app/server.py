@@ -8,13 +8,15 @@ from pathlib import Path, PurePosixPath
 from urllib.parse import parse_qs, quote, unquote, urlsplit
 from original_store import OriginalStore, OriginalError, atomic_json, hash_file, safe_name, CHUNK
 from ingest import MAX_ZIP, prepare_zip, documents_at, render_md, scan_html, RENDERER_VERSION
+from reading_preferences import FONT_ASSET_PINS, FONT_FAMILIES, valid_font_size
 
 ROOT=Path(__file__).resolve().parent
 PATCH_VERSION="2.0.0-dev"
 MIME={".svg":"image/svg+xml",".md":"text/plain; charset=utf-8",".html":"text/html; charset=utf-8",
-      ".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8"}
+      ".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",
+      ".woff2":"font/woff2",".ttf":"font/ttf",".otf":"font/otf",".txt":"text/plain; charset=utf-8",".pdf":"application/pdf",".json":"application/json; charset=utf-8"}
 CONTENT_CSP="sandbox; default-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
-APP_CSP="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+APP_CSP="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
 RID=re.compile(r"[a-f0-9]{24}-\d+")
 JOBID=re.compile(r"[a-f0-9-]{20,80}")
 
@@ -23,7 +25,7 @@ class ArchiveError(OriginalError):
         super().__init__(message,status); self.existing=existing; self.code=code
 
 def default_reading():
-    return {"library":True,"toc":True,"fontSize":18,"lineHeight":1.8,"width":"balanced","focus":False,
+    return {"library":True,"toc":True,"fontSize":18,"fontFamily":"system","lineHeight":1.8,"width":"balanced","focus":False,
             "focusRestore":{"library":True,"toc":True}}
 
 def validate_reading(value):
@@ -31,7 +33,8 @@ def validate_reading(value):
         raise ArchiveError("阅读设置包含无效字段。")
     for key,item in value.items():
         if key in ("library","toc","focus") and type(item) is not bool: raise ArchiveError("阅读状态必须是布尔值。")
-        if key=="fontSize" and (type(item) is not int or item not in (16,17,18,20,22)): raise ArchiveError("阅读字号无效。")
+        if key=="fontSize" and not valid_font_size(item): raise ArchiveError("阅读字号无效。")
+        if key=="fontFamily" and (type(item) is not str or item not in FONT_FAMILIES): raise ArchiveError("阅读字体无效。")
         if key=="lineHeight" and (type(item) not in (int,float) or item not in (1.6,1.8,2)): raise ArchiveError("Invalid reading line height.")
         if key=="width" and item not in ("narrow","balanced","wide"): raise ArchiveError("阅读宽度无效。")
         if key=="focusRestore" and (not isinstance(item,dict) or not set(item).issubset({"library","toc"}) or any(type(v) is not bool for v in item.values())):
@@ -594,10 +597,12 @@ def make_handler(store,port):
                 self._security(extra); self.end_headers(); self.wfile.write(body)
             except (ConnectionError,TimeoutError): pass
         def _security(self,extra=None):
-            self.send_header("X-Content-Type-Options","nosniff"); self.send_header("Cache-Control","no-store")
+            self.send_header("X-Content-Type-Options","nosniff")
+            self.send_header("Cache-Control",(extra or {}).get("Cache-Control","no-store"))
             self.send_header("Referrer-Policy","no-referrer"); self.send_header("X-Frame-Options","SAMEORIGIN")
             if extra:
-                for key,value in extra.items(): self.send_header(key,value)
+                for key,value in extra.items():
+                    if key.lower()!="cache-control": self.send_header(key,value)
         def send_file(self,target,ctype,extra=None):
             with target.open("rb") as inp:
                 size=os.fstat(inp.fileno()).st_size
@@ -648,7 +653,13 @@ def make_handler(store,port):
                 if not target.is_relative_to(web): raise ArchiveError("页面不存在。",404)
                 OriginalStore._plain_ancestors(target)
                 if not target.resolve().is_relative_to(web) or not target.is_file(): raise ArchiveError("页面不存在。",404)
-                return self.send_file(target,MIME.get(target.suffix.lower(),"application/octet-stream"),{"Content-Security-Policy":APP_CSP})
+                headers={"Content-Security-Policy":APP_CSP}
+                # Only one of six reviewed binaries with its exact content pin is
+                # immutable. API, reports and unversioned files remain no-store.
+                pin=FONT_ASSET_PINS.get(path)
+                if pin and set(params)=={"v"} and params.get("v")==[pin]:
+                    headers["Cache-Control"]="private, max-age=31536000, immutable"
+                return self.send_file(target,MIME.get(target.suffix.lower(),"application/octet-stream"),headers)
             except (ConnectionError,TimeoutError): pass
             except (ValueError,UnicodeError) as exc: self.error(ArchiveError("请求参数无效。"))
             except Exception as exc: self.error(exc)

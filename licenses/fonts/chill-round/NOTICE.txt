@@ -1,0 +1,11 @@
+寒蝉全圆体 ChillRoundF — ChillType，SIL Open Font License 1.1。
+OFL: retain copyright and license; no font-only sale; reserved names ChillRoundF / ChillRoundM apply to modified fonts. Original unmodified Regular and Bold TTF bundled.
+Source: https://github.com/Warren2060/ChillRound/releases/download/v3.200/ChillRoundF_v3.200.zip
+License: https://raw.githubusercontent.com/Warren2060/ChillRound/v3.200/LICENSE
+LICENSE.txt is the unchanged official upstream license file.
+
+Original font copyright notices (preserved in the unchanged fonts):
+{Kosugi Maru}{Justfont}{Maoken}{ChillType}
+Copyright(C)2010 MOTOYA CO.,LTD.
+
+Project distribution policy: bundled-source-and-app

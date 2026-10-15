@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "createdUtc": "2026-10-15T10:28:20.909677+00:00",
+  "purpose": "Fonts embedded in ReferenceLibrary application for offline report reading",
+  "families": [
+    {
+      "id": "misans",
+      "directory": "misans",
+      "name": "MiSans 小米",
+      "cssFamily": "Library MiSans",
+      "versionLabel": "MiSans Version 4.009; official package Last-Modified 2025-07-14",
+      "license": "MiSans Font Intellectual Property License Agreement",
+      "sourceUrl": "https://hyperos.mi.com/font-download/MiSans.zip",
+      "officialPage": "https://hyperos.mi.com/font/zh/download/",
+      "faqUrl": "https://hyperos.mi.com/font/zh/faq/",
+      "licenseSourceUrl": "https://hyperos.mi.com/font-download/MiSans%E5%AD%97%E4%BD%93%E7%9F%A5%E8%AF%86%E4%BA%A7%E6%9D%83%E8%AE%B8%E5%8F%AF%E5%8D%8F%E8%AE%AE.pdf",
+      "credit": "本软件使用 MiSans 字体，由小米主导，联合蒙纳、汉仪共同制作。",
+      "distribution": "Unmodified font files embedded in the complete application; retain copyright and complete license; acknowledge MiSans in software. Not an independent font repository, font-only archive, resale, sublicense or font service. No adaptation/redevelopment.",
+      "files": [
+        {
+          "path": "app/web/fonts/misans/Regular.woff2",
+          "webPath": "fonts/misans/Regular.woff2",
+          "bytes": 4858624,
+          "sha256": "d704c1a932c0bd7e8a071d276cd81c0ed0c9fecfa26ac234f4bed0559fe1cb2d",
+          "format": "woff2",
+          "weight": 400,
+          "cssWeight": 400,
+          "authoredWeightClass": 330,
+          "version": [
+            "Version 4.009"
+          ],
+          "glyphCount": 29758,
+          "mappedCodepoints": 29571,
+          "axes": [],
+          "originalUnmodified": true,
+          "distributionPolicy": "embedded-app-only",
+          "sourceArchiveBytes": 227880072,
+          "zipMember": "MiSans/woff2/MiSans-Regular.woff2",
+          "zipCRC32": "e489be3f",
+          "sourceArchiveLastModified": "Mon, 14 Jul 2025 12:06:28 GMT"
+        },
+        {
+          "path": "app/web/fonts/misans/Bold.woff2",
+          "webPath": "fonts/misans/Bold.woff2",
+          "bytes": 5081104,
+          "sha256": "1c5a7515b61bc82baaa2e2c2fdae2032479fb9a99e09d4d021dc17314fc5939b",
+          "format": "woff2",
+          "weight": 700,
+          "cssWeight": 700,
+          "authoredWeightClass": 630,
+          "version": [
+            "Version 4.009"
+          ],
+          "glyphCount": 29758,
+          "mappedCodepoints": 29571,
+          "axes": [],
+          "originalUnmodified": true,
+          "distributionPolicy": "embedded-app-only",
+          "sourceArchiveBytes": 227880072,
+          "zipMember": "MiSans/woff2/MiSans-Bold.woff2",
+          "zipCRC32": "ef687515",
+          "sourceArchiveLastModified": "Mon, 14 Jul 2025 12:06:28 GMT"
+        }
+      ],
+      "licenseWebPath": "fonts/misans/LICENSE.txt",
+      "noticeWebPath": "fonts/misans/NOTICE.txt",
+      "licenseFiles": [
+        {
+          "path": "licenses/fonts/misans/LICENSE.pdf",
+          "bytes": 79535,
+          "sha256": "4a93a27cd2bd81b3b5ecfd0a853144a876fa26938a93a68443c67d74172fcb86"
+        },
+        {
+          "path": "licenses/fonts/misans/LICENSE.txt",
+          "bytes": 9942,
+          "sha256": "ce325fc07eb389826e90647dfcf83d65d890fb5734c3199f5c87e72a4cea2018"
+        },
+        {
+          "path": "licenses/fonts/misans/NOTICE.txt",
+          "bytes": 850,
+          "sha256": "5001d72821634acae01fa477ef335f7a6daabee48d62f421c16df5b9601adec3"
+        }
+      ],
+      "distributionPolicy": "embedded-app-only",
+      "publicSourceIncludesFontBinaries": false,
+      "completeApplicationIncludesFontBinaries": true,
+      "copyrightNotices": [
+        "Copyright © 2020-2025 Beijing Xiaomi Mobile Software Co.,Ltd. All Rights Reserved."
+      ],
+      "publicBuildPreparation": {
+        "script": "packaging/prepare_misans.py",
+        "source": "official Xiaomi archive only",
+        "requiresNetworkAtBuildTime": true,
+        "requiresNetworkAtApplicationRuntime": false,
+        "fontOnlyPublicationAllowed": false
+      },
+      "licensingInterpretation": "Official FAQ permits embedded fonts with in-software MiSans acknowledgement; license permits distributing application works and prohibits separate font redistribution. It does not explicitly discuss raw public source asset URLs. Conservative project policy excludes MiSans binary files from public source while embedding original fonts in complete offline application packages."
+    },
+    {
+      "id": "noto-sans-sc",
+      "directory": "noto-sans-sc",
+      "name": "Noto Sans SC 思源系",
+      "cssFamily": "Library Noto Sans SC",
+      "versionLabel": "Google Fonts commit b7c8331cf620346575487ef8db0e2c729f014675",
+      "license": "SIL Open Font License 1.1",
+      "sourceUrl": "https://raw.githubusercontent.com/google/fonts/b7c8331cf620346575487ef8db0e2c729f014675/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+      "officialPage": "https://github.com/google/fonts/tree/b7c8331cf620346575487ef8db0e2c729f014675/ofl/notosanssc",
+      "licenseSourceUrl": "https://raw.githubusercontent.com/google/fonts/b7c8331cf620346575487ef8db0e2c729f014675/ofl/notosanssc/OFL.txt",
+      "credit": "Noto Sans SC — Google / Adobe，SIL Open Font License 1.1。",
+      "distribution": "OFL: retain copyright and license; do not sell font by itself; modified fonts must respect reserved font names; font license does not relicense application. Original bytes bundled.",
+      "files": [
+        {
+          "path": "app/web/fonts/noto-sans-sc/Variable.ttf",
+          "webPath": "fonts/noto-sans-sc/Variable.ttf",
+          "bytes": 17772300,
+          "sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+          "format": "truetype",
+          "weight": [
+            100,
+            900
+          ],
+          "cssWeight": [
+            100,
+            900
+          ],
+          "authoredWeightClass": 100,
+          "version": [
+            "Version 2.004-H2;hotconv 1.0.118;makeotfexe 2.5.65603"
+          ],
+          "glyphCount": 31036,
+          "mappedCodepoints": 30890,
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 100.0,
+              "max": 900.0
+            }
+          ],
+          "originalUnmodified": true,
+          "distributionPolicy": "bundled-source-and-app"
+        }
+      ],
+      "licenseWebPath": "fonts/noto-sans-sc/LICENSE.txt",
+      "noticeWebPath": "fonts/noto-sans-sc/NOTICE.txt",
+      "licenseFiles": [
+        {
+          "path": "licenses/fonts/noto-sans-sc/LICENSE.txt",
+          "bytes": 4388,
+          "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+        },
+        {
+          "path": "licenses/fonts/noto-sans-sc/NOTICE.txt",
+          "bytes": 762,
+          "sha256": "5451bd61d9c37f1f7116266acc7cc1035cc504cd7a58812d3df8d12a0fb4c41e"
+        }
+      ],
+      "distributionPolicy": "bundled-source-and-app",
+      "publicSourceIncludesFontBinaries": true,
+      "completeApplicationIncludesFontBinaries": true,
+      "copyrightNotices": [
+        "(c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'."
+      ]
+    },
+    {
+      "id": "lxgw-wenkai",
+      "directory": "lxgw-wenkai-screen",
+      "name": "霞鹜文楷 屏幕版",
+      "cssFamily": "Library LXGW WenKai Screen",
+      "versionLabel": "v1.522",
+      "sourceUrl": "https://github.com/lxgw/LxgwWenKai-Screen/releases/download/v1.522/LXGWWenKaiScreen.ttf",
+      "officialPage": "https://github.com/lxgw/LxgwWenKai-Screen/releases/tag/v1.522",
+      "license": "SIL Open Font License 1.1",
+      "licenseSourceUrl": "https://raw.githubusercontent.com/lxgw/LxgwWenKai-Screen/v1.522/OFL.txt",
+      "credit": "霞鹜文楷屏幕阅读版 — LXGW；源自 FONTWORKS Klee，SIL Open Font License 1.1。",
+      "distribution": "OFL: retain copyright and license; do not sell font by itself; original unmodified TTF bundled, no subsetting, conversion or reserved-name issue. One authored static weight; browser may synthesize bold.",
+      "files": [
+        {
+          "path": "app/web/fonts/lxgw-wenkai-screen/Regular.ttf",
+          "webPath": "fonts/lxgw-wenkai-screen/Regular.ttf",
+          "bytes": 25673994,
+          "sha256": "cd1a6fa39c4ea42fd8f4e289945789b0e510cf7016435640f8893cdad9b220f3",
+          "format": "truetype",
+          "weight": 400,
+          "cssWeight": 400,
+          "authoredWeightClass": 400,
+          "version": [
+            "Version 1.522;March 19,2026"
+          ],
+          "glyphCount": 47871,
+          "mappedCodepoints": 47449,
+          "axes": [],
+          "originalUnmodified": true,
+          "distributionPolicy": "bundled-source-and-app"
+        }
+      ],
+      "licenseWebPath": "fonts/lxgw-wenkai-screen/LICENSE.txt",
+      "noticeWebPath": "fonts/lxgw-wenkai-screen/NOTICE.txt",
+      "licenseFiles": [
+        {
+          "path": "licenses/fonts/lxgw-wenkai-screen/LICENSE.txt",
+          "bytes": 4455,
+          "sha256": "4d72e3080cdb3be63638bb7197c7caae55b6e4cbe1bab1ded2830bdff0c9b438"
+        },
+        {
+          "path": "licenses/fonts/lxgw-wenkai-screen/NOTICE.txt",
+          "bytes": 807,
+          "sha256": "9a57023fa6783628c205712024797d36efd2647ba41c58a6a9aa1735e2ddca39"
+        }
+      ],
+      "distributionPolicy": "bundled-source-and-app",
+      "publicSourceIncludesFontBinaries": true,
+      "completeApplicationIncludesFontBinaries": true,
+      "copyrightNotices": [
+        "Copyright 2021-2024 LXGW (https://github.com/lxgw/LxgwWenKai-Screen)\r\nCopyright 2020 The Klee Project Authors (https://github.com/fontworks-fonts/Klee)"
+      ]
+    },
+    {
+      "id": "chill-round",
+      "directory": "chill-round",
+      "name": "寒蝉全圆体",
+      "cssFamily": "Library Chill Round",
+      "versionLabel": "ChillRoundF v3.200 (full round; not ChillRoundM half round v1.805)",
+      "sourceUrl": "https://github.com/Warren2060/ChillRound/releases/download/v3.200/ChillRoundF_v3.200.zip",
+      "officialPage": "https://github.com/Warren2060/ChillRound/releases/tag/v3.200",
+      "license": "SIL Open Font License 1.1",
+      "licenseSourceUrl": "https://raw.githubusercontent.com/Warren2060/ChillRound/v3.200/LICENSE",
+      "credit": "寒蝉全圆体 ChillRoundF — ChillType，SIL Open Font License 1.1。",
+      "distribution": "OFL: retain copyright and license; no font-only sale; reserved names ChillRoundF / ChillRoundM apply to modified fonts. Original unmodified Regular and Bold TTF bundled.",
+      "files": [
+        {
+          "path": "app/web/fonts/chill-round/Regular.ttf",
+          "webPath": "fonts/chill-round/Regular.ttf",
+          "bytes": 6205268,
+          "sha256": "7ccfc2cd0e971edeac7f65516df8db379f0f84d0d8ff79ee4dfe377956418d3b",
+          "format": "truetype",
+          "weight": 400,
+          "cssWeight": 400,
+          "authoredWeightClass": 400,
+          "version": [
+            "Version 3.200"
+          ],
+          "glyphCount": 15865,
+          "mappedCodepoints": 14304,
+          "axes": [],
+          "originalUnmodified": true,
+          "distributionPolicy": "bundled-source-and-app"
+        },
+        {
+          "path": "app/web/fonts/chill-round/Bold.ttf",
+          "webPath": "fonts/chill-round/Bold.ttf",
+          "bytes": 7004128,
+          "sha256": "f2c4f9295d9d04a1eb6392ae3c51ecf2a9ffab355a45c6686eeec5eede3381ec",
+          "format": "truetype",
+          "weight": 700,
+          "cssWeight": 700,
+          "authoredWeightClass": 700,
+          "version": [
+            "Version 3.200"
+          ],
+          "glyphCount": 15865,
+          "mappedCodepoints": 14304,
+          "axes": [],
+          "originalUnmodified": true,
+          "distributionPolicy": "bundled-source-and-app"
+        }
+      ],
+      "licenseWebPath": "fonts/chill-round/LICENSE.txt",
+      "noticeWebPath": "fonts/chill-round/NOTICE.txt",
+      "licenseFiles": [
+        {
+          "path": "licenses/fonts/chill-round/LICENSE.txt",
+          "bytes": 4375,
+          "sha256": "d45891f8adfd21368c98e803603df1f575ff3fc4a6ec713ba7ccf0e3cba15b28"
+        },
+        {
+          "path": "licenses/fonts/chill-round/NOTICE.txt",
+          "bytes": 679,
+          "sha256": "6feb76c46ddfa7b6b856ff0f76b3ab6bfdf62e9f110b8b533fb51f63dcab8855"
+        }
+      ],
+      "distributionPolicy": "bundled-source-and-app",
+      "publicSourceIncludesFontBinaries": true,
+      "completeApplicationIncludesFontBinaries": true,
+      "copyrightNotices": [
+        "{Kosugi Maru}{Justfont}{Maoken}{ChillType}\nCopyright(C)2010 MOTOYA CO.,LTD."
+      ]
+    }
+  ],
+  "appleFontsBundled": false,
+  "applePolicy": "Use existing system-ui/PingFang SC on macOS only through installed system fonts. Do not distribute Apple font binaries.",
+  "fontFilesUnmodified": true,
+  "noSubsettingOrConversion": true,
+  "runtimeNetworkRequired": false,
+  "loadingPolicy": "Only selected family/used weights loaded by browser; system fallback for uncovered characters.",
+  "distributionPolicy": {
+    "misans": "embedded-app-only: original MiSans binaries included in complete app ZIP only; public app source uses official preparation script + exact member/size/CRC/SHA verification. No runtime font download.",
+    "ofl": "bundled-source-and-app: four original OFL binaries can be included with complete app source and distributable, retaining full licenses/copyright.",
+    "system": "No Apple binaries. Existing installed system font selection only."
+  },
+  "policyUpdatedUtc": "2026-10-15T10:29:56.241939+00:00"
+}

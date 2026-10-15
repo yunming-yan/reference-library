@@ -18,7 +18,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-PURE_TESTS = ("test_backend_api.py", "test_cache_sqlite.py", "test_platform_directories.py")
+PURE_TESTS = ("test_backend_api.py", "test_cache_sqlite.py", "test_platform_directories.py", "test_reading_preferences.py")
 
 
 def main() -> int:
